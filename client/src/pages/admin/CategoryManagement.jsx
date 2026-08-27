@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
-import { createCategory, updateCategory, deleteCategory } from '../../services/adminService';
-import { Plus, Edit, Trash2, FolderTree } from 'lucide-react';
+import { createCategory, updateCategory, deleteCategory, uploadImage } from '../../services/adminService';
+import { Plus, Edit, Trash2, FolderTree, Upload, X } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import toast from 'react-hot-toast';
@@ -10,6 +10,25 @@ import { getImageUrl } from '../../utils/getImageUrl';
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const form = new FormData();
+    form.append('image', file);
+
+    setUploading(true);
+    try {
+      const imagePath = await uploadImage(form);
+      setFormData(prev => ({ ...prev, image: imagePath }));
+      toast.success('Image uploaded');
+    } catch (error) {
+      toast.error('Image upload failed');
+    }
+    setUploading(false);
+  };
   
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -222,7 +241,33 @@ const CategoryManagement = () => {
                   required
                 />
               </div>
-              <Input label="Image URL" name="image" value={formData.image} onChange={handleChange} />
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-2">Category Image</label>
+                {formData.image ? (
+                  <div className="relative w-32 h-32 rounded-xl border border-gray-200 overflow-hidden group mb-2">
+                    <img src={getImageUrl(formData.image)} alt="Category" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                      className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white"
+                    >
+                      <X size={24} />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 hover:text-primary hover:border-primary hover:bg-primary/5 cursor-pointer transition-colors relative mb-2">
+                    {uploading ? (
+                       <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <Upload size={24} className="mb-1" />
+                        <span className="text-xs font-medium">Upload</span>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                      </>
+                    )}
+                  </label>
+                )}
+              </div>
               
               <label className="flex items-center gap-3 cursor-pointer py-2">
                 <input 
