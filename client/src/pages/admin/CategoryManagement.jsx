@@ -184,7 +184,32 @@ const CategoryManagement = () => {
           <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-6">{isEdit ? 'Edit Category' : 'Create Category'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input label="Name" name="name" value={formData.name} onChange={handleChange} required />
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-2">Name</label>
+                <select 
+                  name="name" 
+                  value={formData.name} 
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData(prev => ({
+                      ...prev,
+                      name: value,
+                      slug: value.toLowerCase().replace(/ /g, '-')
+                    }));
+                  }}
+                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Mens">Mens</option>
+                  <option value="Womens">Womens</option>
+                  <option value="Kids">Kids</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Home Appliance">Home Appliance</option>
+                  <option value="Gift">Gift</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
               <Input label="Slug" name="slug" value={formData.slug} onChange={handleChange} required />
               <div>
                 <label className="block text-sm font-bold text-gray-900 mb-2">Description</label>

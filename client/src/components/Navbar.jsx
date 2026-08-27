@@ -51,10 +51,10 @@ const Navbar = () => {
               />
               <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
             </form>
-            <nav className="ml-8 flex space-x-6">
               <Link to="/products" className="text-text-muted hover:text-primary font-medium transition-colors">Shop</Link>
-              <Link to="/products?category=fashion" className="text-text-muted hover:text-primary font-medium transition-colors">Fashion</Link>
-              <Link to="/products?category=electronics" className="text-text-muted hover:text-primary font-medium transition-colors">Tech</Link>
+              <Link to="/products?category=mens" className="text-text-muted hover:text-primary font-medium transition-colors">Mens</Link>
+              <Link to="/products?category=womens" className="text-text-muted hover:text-primary font-medium transition-colors">Womens</Link>
+              <Link to="/products?category=kids" className="text-text-muted hover:text-primary font-medium transition-colors">Kids</Link>
             </nav>
           </div>
 
@@ -156,8 +156,9 @@ const Navbar = () => {
             
             <div className="flex flex-col space-y-2">
               <Link to="/products" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Shop All</Link>
-              <Link to="/products?category=fashion" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Fashion</Link>
-              <Link to="/products?category=electronics" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Electronics</Link>
+              <Link to="/products?category=mens" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Mens</Link>
+              <Link to="/products?category=womens" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Womens</Link>
+              <Link to="/products?category=kids" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Kids</Link>
             </div>
 
             <div className="border-t border-border pt-4">
