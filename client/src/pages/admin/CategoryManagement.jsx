@@ -5,6 +5,7 @@ import { Plus, Edit, Trash2, FolderTree } from 'lucide-react';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../utils/getImageUrl';
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -138,7 +139,7 @@ const CategoryManagement = () => {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         {cat.image ? (
-                          <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover bg-gray-100 border border-gray-200" />
+                          <img src={getImageUrl(cat.image)} alt={cat.name} className="w-10 h-10 rounded-lg object-cover bg-gray-100 border border-gray-200" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400">
                             <FolderTree size={16} />

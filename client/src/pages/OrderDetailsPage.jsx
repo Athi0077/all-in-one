@@ -5,6 +5,7 @@ import { getOrderDetails, cancelOrder } from '../services/orderService';
 import { Package, Truck, CheckCircle, Clock, MapPin, CreditCard, ArrowLeft, XCircle, Star } from 'lucide-react';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -108,7 +109,7 @@ const OrderDetailsPage = () => {
             <div className="divide-y divide-gray-100">
               {order.items.map((item, index) => (
                 <div key={index} className="p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                  <img src={item.image} alt={item.name} className="w-20 h-20 rounded-xl object-cover border border-gray-100" />
+                  <img src={getImageUrl(item.image)} alt={item.name} className="w-20 h-20 rounded-xl object-cover border border-gray-100" />
                   <div className="flex-1">
                     <Link to={`/products/${item.product}`} className="font-bold text-gray-900 hover:text-primary transition-colors line-clamp-2 mb-1">
                       {item.name}

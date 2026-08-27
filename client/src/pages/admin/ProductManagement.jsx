@@ -4,6 +4,7 @@ import { getAdminProducts, deleteProduct } from '../../services/adminService';
 import { Plus, Edit, Trash2, Search, Package, Star } from 'lucide-react';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../utils/getImageUrl';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -105,7 +106,7 @@ const ProductManagement = () => {
                   <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-4">
-                        <img src={product.images[0]} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-gray-200" />
+                        <img src={getImageUrl(product.images[0])} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-gray-200" />
                         <div>
                           <p className="font-bold text-gray-900 line-clamp-1">{product.name}</p>
                           <div className="flex items-center text-xs text-gray-500 mt-1">

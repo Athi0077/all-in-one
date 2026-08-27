@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { getMyOrders } from '../services/orderService';
 import { Package, ExternalLink, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -116,7 +117,7 @@ const OrdersPage = () => {
                     {order.items.slice(0, 3).map((item, index) => (
                       <img 
                         key={index} 
-                        src={item.image} 
+                        src={getImageUrl(item.image)} 
                         alt={item.name} 
                         className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm relative z-[index]"
                         style={{ zIndex: 3 - index }}

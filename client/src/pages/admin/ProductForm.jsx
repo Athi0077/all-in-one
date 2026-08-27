@@ -6,6 +6,7 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../utils/getImageUrl';
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -177,7 +178,7 @@ const ProductForm = () => {
           <div className="flex flex-wrap gap-4 mb-4">
             {formData.images.map((img, idx) => (
               <div key={idx} className="relative w-24 h-24 rounded-xl border border-gray-200 overflow-hidden group">
-                <img src={img} alt="Product" className="w-full h-full object-cover" />
+                <img src={getImageUrl(img)} alt="Product" className="w-full h-full object-cover" />
                 <button 
                   type="button"
                   onClick={() => removeImage(idx)}

@@ -5,6 +5,7 @@ import { updateOrderStatus } from '../../services/adminService';
 import { ArrowLeft, Package, MapPin, CreditCard, Clock, Truck, CheckCircle } from 'lucide-react';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../utils/getImageUrl';
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -79,7 +80,7 @@ const OrderDetails = () => {
             <div className="divide-y divide-gray-100">
               {order.items.map((item, index) => (
                 <div key={index} className="p-6 flex items-center gap-4">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover border border-gray-100" />
+                  <img src={getImageUrl(item.image)} alt={item.name} className="w-16 h-16 rounded-xl object-cover border border-gray-100" />
                   <div className="flex-1">
                     <p className="font-bold text-gray-900 line-clamp-1">{item.name}</p>
                     <p className="text-sm text-gray-500">Qty: {item.qty} × ${item.price.toFixed(2)}</p>

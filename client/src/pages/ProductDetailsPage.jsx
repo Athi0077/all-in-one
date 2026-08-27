@@ -8,6 +8,7 @@ import { ShieldCheck, Truck, RotateCcw, Heart, Share2, Star, Minus, Plus, Messag
 import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -121,7 +122,7 @@ const ProductDetailsPage = () => {
         <div className="w-full lg:w-1/2">
           <div className="bg-gray-100 rounded-3xl overflow-hidden mb-4 relative aspect-square">
             <img 
-              src={product.images[activeImage]} 
+              src={getImageUrl(product.images[activeImage])} 
               alt={product.name} 
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -134,7 +135,7 @@ const ProductDetailsPage = () => {
                   onClick={() => setActiveImage(idx)}
                   className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 ${activeImage === idx ? 'border-primary' : 'border-transparent'}`}
                 >
-                  <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  <img src={getImageUrl(img)} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 </button>
               ))}
             </div>

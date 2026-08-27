@@ -8,6 +8,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import { CheckCircle2, Tag } from 'lucide-react';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const CheckoutPage = () => {
   const { cartItems, cartTotal, clearCart } = useContext(CartContext);
@@ -257,7 +258,7 @@ const CheckoutPage = () => {
             <div className="space-y-4 mb-6 border-b border-gray-200 pb-6">
               {cartItems.map((item, index) => (
                 <div key={index} className="flex gap-4">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                  <img src={getImageUrl(item.image)} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-gray-900 line-clamp-2">{item.name}</h4>
                     <p className="text-sm text-gray-500">{item.qty} x ${item.price.toFixed(2)}</p>

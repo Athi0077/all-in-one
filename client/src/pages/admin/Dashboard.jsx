@@ -12,6 +12,7 @@ import {
   Clock
 } from 'lucide-react';
 import {
+import { getImageUrl } from '../../utils/getImageUrl';
   BarChart,
   Bar,
   XAxis,
@@ -233,7 +234,7 @@ const Dashboard = () => {
           <div className="p-6 flex-1 flex flex-col gap-6">
             {stats.topProducts.map(product => (
               <div key={product._id} className="flex items-center gap-4">
-                <img src={product.images[0]} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
+                <img src={getImageUrl(product.images[0])} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-gray-900 truncate">{product.name}</h4>
                   <p className="text-xs text-gray-500 truncate">${product.price.toFixed(2)} &bull; {product.stock} in stock</p>

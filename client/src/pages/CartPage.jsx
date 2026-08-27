@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import Button from '../components/Button';
 import EmptyState from '../components/EmptyState';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const CartPage = () => {
   const { cartItems, updateQty, removeFromCart, cartTotal } = useContext(CartContext);
@@ -54,7 +55,7 @@ const CartPage = () => {
                   {/* Product Info */}
                   <div className="col-span-1 sm:col-span-6 flex gap-4 items-center">
                     <img 
-                      src={item.image} 
+                      src={getImageUrl(item.image)} 
                       alt={item.name} 
                       className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border border-gray-100"
                     />
