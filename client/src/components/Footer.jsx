@@ -42,10 +42,10 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-gray-900 mb-4">Categories</h4>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><Link to="/category/fashion" className="hover:text-primary transition-colors">Fashion</Link></li>
-              <li><Link to="/category/electronics" className="hover:text-primary transition-colors">Electronics</Link></li>
-              <li><Link to="/category/home-and-living" className="hover:text-primary transition-colors">Home & Living</Link></li>
-              <li><Link to="/category/beauty" className="hover:text-primary transition-colors">Beauty</Link></li>
+              <li><Link to="/products?category=fashion" className="hover:text-primary transition-colors">Fashion</Link></li>
+              <li><Link to="/products?category=electronics" className="hover:text-primary transition-colors">Electronics</Link></li>
+              <li><Link to="/products?category=home-and-living" className="hover:text-primary transition-colors">Home & Living</Link></li>
+              <li><Link to="/products?category=beauty" className="hover:text-primary transition-colors">Beauty</Link></li>
             </ul>
           </div>
 
