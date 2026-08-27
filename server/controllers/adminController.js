@@ -101,12 +101,12 @@ export const createProduct = async (req, res, next) => {
   try {
     const { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
 
-    if (price < 0 || discountPrice < 0 || stock < 0) {
+    if (Number(price) < 0 || Number(discountPrice) < 0 || Number(stock) < 0) {
       res.status(400);
       throw new Error('Price and stock cannot be negative');
     }
     
-    if (discountPrice > price) {
+    if (Number(discountPrice) > Number(price)) {
       res.status(400);
       throw new Error('Discount price cannot exceed original price');
     }
@@ -139,9 +139,14 @@ export const updateProduct = async (req, res, next) => {
   try {
     const { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
 
-    if (price < 0 || discountPrice < 0 || stock < 0) {
+    if (Number(price) < 0 || Number(discountPrice) < 0 || Number(stock) < 0) {
       res.status(400);
       throw new Error('Price and stock cannot be negative');
+    }
+
+    if (Number(discountPrice) > Number(price)) {
+      res.status(400);
+      throw new Error('Discount price cannot exceed original price');
     }
 
     const product = await Product.findById(req.params.id);
