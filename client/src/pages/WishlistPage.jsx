@@ -31,11 +31,11 @@ const WishlistPage = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[1, 2, 3, 4].map(n => <ProductSkeleton key={n} />)}
         </div>
       ) : wishlist && wishlist.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {wishlist.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}

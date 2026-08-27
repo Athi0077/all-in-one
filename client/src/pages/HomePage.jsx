@@ -146,7 +146,7 @@ const HomePage = () => {
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {loading ? (
               [1, 2, 3, 4].map(n => <ProductSkeleton key={n} />)
             ) : (
@@ -203,7 +203,7 @@ const HomePage = () => {
             <p className="text-gray-500 max-w-2xl mx-auto">Discover the most popular products our customers are loving right now.</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {loading ? (
               [1, 2, 3, 4].map(n => <ProductSkeleton key={n} />)
             ) : (
