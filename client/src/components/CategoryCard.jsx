@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../utils/getImageUrl';
 
 const CategoryCard = ({ category }) => {
   return (
@@ -8,7 +9,7 @@ const CategoryCard = ({ category }) => {
       className="group block relative overflow-hidden rounded-2xl aspect-[4/5] sm:aspect-square"
     >
       <img 
-        src={category.image || 'https://via.placeholder.com/400'} 
+        src={getImageUrl(category.image)} 
         alt={category.name}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />

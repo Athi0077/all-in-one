@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
+import { getImageUrl } from '../utils/getImageUrl';
 import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
@@ -54,7 +55,7 @@ const ProductCard = ({ product }) => {
       {/* Image */}
       <Link to={`/products/${product._id}`} className="block relative pt-[100%] overflow-hidden bg-gray-100">
         <img 
-          src={product.images?.[0] || 'https://via.placeholder.com/400'} 
+          src={getImageUrl(product.images?.[0])} 
           alt={product.name} 
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
