@@ -5,7 +5,7 @@ import { getImageUrl } from '../utils/getImageUrl';
 const CategoryCard = ({ category }) => {
   return (
     <Link 
-      to={`/category/${category.slug}`}
+      to={`/products?category=${category.slug}`}
       className="group block relative overflow-hidden rounded-2xl aspect-[4/5] sm:aspect-square"
     >
       <img 
