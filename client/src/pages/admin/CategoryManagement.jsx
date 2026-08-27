@@ -47,7 +47,7 @@ const CategoryManagement = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/api/categories');
+      const { data } = await api.get('/categories');
       setCategories(data);
     } catch (error) {
       toast.error('Failed to load categories');
