@@ -51,6 +51,7 @@ const Navbar = () => {
               />
               <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
             </form>
+            <nav className="ml-8 flex space-x-6">
               <Link to="/products" className="text-text-muted hover:text-primary font-medium transition-colors">Shop</Link>
               <Link to="/products?category=mens" className="text-text-muted hover:text-primary font-medium transition-colors">Mens</Link>
               <Link to="/products?category=womens" className="text-text-muted hover:text-primary font-medium transition-colors">Womens</Link>
