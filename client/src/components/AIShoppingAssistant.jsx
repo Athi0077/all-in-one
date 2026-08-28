@@ -256,7 +256,7 @@ const AIShoppingAssistant = () => {
             <button
               type="submit"
               disabled={!inputValue.trim() || isLoading}
-              className="absolute right-1.5 top-1.5 bottom-1.5 w-10 h-10 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition-colors"
+              className="absolute right-2.5 top-1.5 bottom-1.5 w-10 h-10 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition-colors"
             >
               <Send size={16} className="ml-1" />
             </button>
