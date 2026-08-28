@@ -17,9 +17,9 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const { data } = await api.get(`/api/orders/${id}`);
+        const { data } = await api.get(`/orders/${id}`);
         setOrder(data);
-        setCurrentStatus(data.status);
+        setCurrentStatus(data.orderStatus);
       } catch (error) {
         console.error(error);
         toast.error('Failed to load order details');
@@ -36,10 +36,10 @@ const OrderDetails = () => {
     try {
       await updateOrderStatus(id, currentStatus);
       toast.success('Order status updated');
-      setOrder(prev => ({ ...prev, status: currentStatus }));
+      setOrder(prev => ({ ...prev, orderStatus: currentStatus }));
     } catch (error) {
       console.error(error);
-      toast.error('Failed to update status');
+      toast.error(error.response?.data?.message || 'Failed to update status');
     }
     setStatusUpdating(false);
   };
@@ -121,8 +121,12 @@ const OrderDetails = () => {
               </div>
               <div className="p-6 flex flex-col h-full justify-center">
                 <p className="font-medium text-gray-900 mb-2">Method: {order.paymentMethod}</p>
-                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 w-max">
-                  Paid Successfully
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold w-max ${
+                  order.paymentStatus === 'Completed' ? 'bg-green-100 text-green-800' :
+                  order.paymentStatus === 'Failed' ? 'bg-red-100 text-red-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {order.paymentStatus || 'Pending'}
                 </div>
               </div>
             </div>
@@ -146,10 +150,10 @@ const OrderDetails = () => {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Update Status</h2>
             <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
-              {getStatusIcon(order.status)}
+              {getStatusIcon(order.orderStatus)}
               <div>
                 <p className="text-xs text-gray-500 font-semibold uppercase">Current Status</p>
-                <p className="font-bold text-gray-900">{order.status}</p>
+                <p className="font-bold text-gray-900">{order.orderStatus}</p>
               </div>
             </div>
 
@@ -163,13 +167,14 @@ const OrderDetails = () => {
                 >
                   <option value="Pending">Pending</option>
                   <option value="Confirmed">Confirmed</option>
+                  <option value="Processing">Processing</option>
                   <option value="Packed">Packed</option>
                   <option value="Shipped">Shipped</option>
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
-              <Button type="submit" className="w-full rounded-xl" isLoading={statusUpdating} disabled={currentStatus === order.status}>
+              <Button type="submit" className="w-full rounded-xl" isLoading={statusUpdating} disabled={currentStatus === order.orderStatus}>
                 Update Order Status
               </Button>
             </form>

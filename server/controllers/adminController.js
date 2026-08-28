@@ -21,7 +21,7 @@ export const getDashboardStats = async (req, res, next) => {
     const orders = await Order.find();
     const totalRevenue = orders.reduce((acc, order) => acc + order.total, 0);
 
-    const pendingOrders = await Order.countDocuments({ status: 'Pending' });
+    const pendingOrders = await Order.countDocuments({ orderStatus: 'Pending' });
     
     // Low stock products
     const settings = await Setting.findOne() || { lowStockThreshold: 5 };
@@ -285,7 +285,7 @@ export const getAdminOrders = async (req, res, next) => {
     
     let query = {};
     if (req.query.status && req.query.status !== 'All') {
-      query.status = req.query.status;
+      query.orderStatus = req.query.status;
     }
 
     const count = await Order.countDocuments(query);
@@ -308,13 +308,13 @@ export const updateOrderStatus = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
     if (order) {
-      const validStatuses = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled'];
+      const validStatuses = ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled'];
       if (!validStatuses.includes(req.body.status)) {
         res.status(400);
         throw new Error('Invalid status');
       }
 
-      order.status = req.body.status;
+      order.orderStatus = req.body.status;
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {

@@ -9,10 +9,11 @@ import { getImageUrl } from '../utils/getImageUrl';
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/login?redirect=/orders');
       return;
@@ -29,7 +30,7 @@ const OrdersPage = () => {
     };
 
     fetchOrders();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const getStatusIcon = (status) => {
     switch (status) {

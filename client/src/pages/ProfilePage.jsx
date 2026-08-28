@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { User, Mail, Phone, MapPin, Shield } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -25,6 +25,7 @@ const ProfilePage = () => {
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/login?redirect=/profile');
       return;
@@ -32,7 +33,8 @@ const ProfilePage = () => {
 
     const fetchProfile = async () => {
       try {
-        const data = await getProfile();
+        const res = await getProfile();
+        const data = res.data || res; // handle both {success:true, data:{}} and direct object just in case
         setFormData({
           name: data.name || '',
           email: data.email || '',
@@ -48,7 +50,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

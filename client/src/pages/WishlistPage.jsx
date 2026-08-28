@@ -9,14 +9,15 @@ import { ProductSkeleton } from '../components/Skeleton';
 
 const WishlistPage = () => {
   const { wishlist, loading } = useContext(WishlistContext);
-  const { user } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/login?redirect=/wishlist');
     }
-  }, [user, navigate]);
+  }, [user, navigate, authLoading]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

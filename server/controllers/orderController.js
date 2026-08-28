@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
 import Coupon from '../models/couponModel.js';
 import { validateAndCalculateStock, decrementStock, restoreStock } from '../services/inventoryService.js';
-import { createPayment } from '../services/paymentService.js';
+import { createPayment, verifyPayment } from '../services/paymentService.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -78,7 +78,7 @@ export const addOrderItems = async (req, res, next) => {
 
       // 6. Handle Payment logic
       if (paymentMethod === 'Online Payment') {
-        const paymentResult = await createPayment(total, 'USD');
+        const paymentResult = await createPayment(total, 'INR');
         createdOrder.paymentResult = { id: paymentResult.id, status: 'Initiated' };
         await createdOrder.save({ session });
       }
@@ -121,9 +121,9 @@ export const cancelOrder = async (req, res, next) => {
       throw new Error('Not authorized');
     }
 
-    if (!['Pending', 'Processing'].includes(order.orderStatus)) {
+    if (order.orderStatus !== 'Pending') {
       res.status(400);
-      throw new Error(`Order cannot be cancelled. Current status: ${order.orderStatus}`);
+      throw new Error(`Order cannot be cancelled once it is ${order.orderStatus}.`);
     }
 
     order.orderStatus = 'Cancelled';
@@ -145,6 +145,49 @@ export const cancelOrder = async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    next(error);
+  }
+};
+
+// @desc    Verify order payment from Razorpay
+// @route   POST /api/orders/:id/verify-payment
+// @access  Private
+export const verifyOrderPayment = async (req, res, next) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      res.status(404);
+      throw new Error('Order not found');
+    }
+
+    if (order.user.toString() !== req.user._id.toString()) {
+      res.status(401);
+      throw new Error('Not authorized to verify this order');
+    }
+
+    const verificationResult = await verifyPayment(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+
+    if (verificationResult.success) {
+      order.paymentStatus = 'Completed';
+      order.orderStatus = 'Processing'; // Update from Pending to Processing
+      order.paymentResult = {
+        id: razorpay_payment_id,
+        status: 'Completed',
+        update_time: new Date().toISOString(),
+      };
+
+      const updatedOrder = await order.save();
+
+      res.json({ success: true, data: updatedOrder });
+    } else {
+      res.status(400);
+      throw new Error('Payment verification failed');
+    }
+  } catch (error) {
     next(error);
   }
 };

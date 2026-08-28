@@ -4,6 +4,7 @@ import { ShoppingCart, Heart, Search, User, Menu, X, LogOut, Package, Settings }
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
+import SearchBar from './SearchBar';
 
 const Navbar = () => {
   const { cartCount } = useContext(CartContext);
@@ -11,16 +12,8 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${searchQuery}`);
-      setIsMenuOpen(false);
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -41,16 +34,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation & Search */}
           <div className="hidden md:flex flex-1 items-center justify-center px-8">
-            <form onSubmit={handleSearch} className="w-full max-w-lg relative">
-              <input
-                type="text"
-                placeholder="Search products, categories..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 border-transparent rounded-full focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
-            </form>
+            <div className="w-full max-w-lg">
+              <SearchBar />
+            </div>
             <nav className="ml-8 flex space-x-6">
               <Link to="/products" className="text-text-muted hover:text-primary font-medium transition-colors">Shop</Link>
               <Link to="/products?category=mens" className="text-text-muted hover:text-primary font-medium transition-colors">Mens</Link>
@@ -144,16 +130,10 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-surface border-t border-border absolute w-full">
           <div className="px-4 pt-4 pb-6 space-y-4 shadow-xl">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-3 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-primary outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
-            </form>
+            <SearchBar 
+              onSearchCallback={() => setIsMenuOpen(false)} 
+              placeholder="Search..."
+            />
             
             <div className="flex flex-col space-y-2">
               <Link to="/products" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium text-text rounded-lg hover:bg-gray-50">Shop All</Link>

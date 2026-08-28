@@ -26,6 +26,7 @@ const orderSchema = mongoose.Schema(
       state: { type: String, required: true },
       zipCode: { type: String, required: true },
       country: { type: String, required: true },
+      landmark: { type: String },
     },
     paymentMethod: {
       type: String,
@@ -45,8 +46,8 @@ const orderSchema = mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      default: 'Processing',
-      enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
+      default: 'Pending',
+      enum: ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled'],
     },
     subtotal: {
       type: Number,

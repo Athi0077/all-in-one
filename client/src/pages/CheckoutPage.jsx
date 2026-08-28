@@ -2,8 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
-import { createOrder, validateCoupon } from '../services/orderService';
-import { getProfile } from '../services/authService';
+import { createOrder, validateCoupon, verifyPayment } from '../services/orderService';
+import { getProfile, updateProfile } from '../services/authService';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
@@ -12,7 +12,7 @@ import { getImageUrl } from '../utils/getImageUrl';
 
 const CheckoutPage = () => {
   const { cartItems, cartTotal, clearCart } = useContext(CartContext);
-  const { user } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -22,6 +22,8 @@ const CheckoutPage = () => {
     city: '',
     postalCode: '',
     country: '',
+    state: '',
+    landmark: '',
   });
   const [paymentMethod, setPaymentMethod] = useState('Online Payment');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,9 +62,11 @@ const CheckoutPage = () => {
         city: addr.city,
         postalCode: addr.zipCode,
         country: addr.country,
+        state: addr.state,
+        landmark: addr.landmark || '',
       });
     } else {
-      setShippingAddress({ address: '', city: '', postalCode: '', country: '' });
+      setShippingAddress({ address: '', city: '', postalCode: '', country: '', state: '', landmark: '' });
     }
   };
 
@@ -81,13 +85,14 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/login?redirect=/checkout');
     }
     if (cartItems.length === 0 && !orderComplete) {
       navigate('/cart');
     }
-  }, [user, navigate, cartItems, orderComplete]);
+  }, [user, navigate, cartItems, orderComplete, authLoading]);
 
   const handleAddressChange = (e) => {
     setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
@@ -104,20 +109,127 @@ const CheckoutPage = () => {
     try {
       const orderData = {
         orderItems: cartItems,
-        shippingAddress,
+        shippingAddress: {
+          street: shippingAddress.address,
+          city: shippingAddress.city,
+          state: shippingAddress.state || 'N/A',
+          zipCode: shippingAddress.postalCode,
+          country: shippingAddress.country,
+          landmark: shippingAddress.landmark,
+        },
         paymentMethod,
         couponCode: couponApplied ? couponApplied.code : null,
       };
 
       const orderRes = await createOrder(orderData);
-      setNewOrderId(orderRes.data._id);
-      setOrderComplete(true);
-      clearCart();
-      toast.success('Order placed successfully!');
+      
+      // Auto-save new address to profile if it was manually entered
+      if (selectedAddressIndex === -1 && user) {
+        try {
+          const newAddress = {
+            street: shippingAddress.address,
+            city: shippingAddress.city,
+            state: shippingAddress.state || 'N/A',
+            zipCode: shippingAddress.postalCode,
+            country: shippingAddress.country,
+            landmark: shippingAddress.landmark,
+            isDefault: savedAddresses.length === 0
+          };
+          await updateProfile({ addresses: [...savedAddresses, newAddress] });
+        } catch (err) {
+          console.error('Failed to auto-save address', err);
+        }
+      }
+      
+      if (paymentMethod === 'Online Payment' && orderRes.data.paymentResult) {
+        const loadRazorpayScript = () => {
+          return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+        };
+
+        const isScriptLoaded = await loadRazorpayScript();
+        if (!isScriptLoaded) {
+           toast.error('Razorpay SDK failed to load. Are you online?');
+           setIsSubmitting(false);
+           return;
+        }
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TV7hXMB718ABCh',
+          amount: Math.round((cartTotal - (couponApplied?.discountAmount || 0)) * 100),
+          currency: 'INR',
+          name: 'All in One Store',
+          description: 'Order Payment',
+          order_id: orderRes.data.paymentResult.id,
+          handler: async function (response) {
+            try {
+              setIsSubmitting(true);
+              const verifyRes = await verifyPayment(orderRes.data._id, {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              if (verifyRes.success) {
+                setNewOrderId(orderRes.data._id);
+                setOrderComplete(true);
+                clearCart();
+                toast.success('Payment successful! Order placed.');
+              }
+            } catch (err) {
+              toast.error('Payment verification failed.');
+              setIsSubmitting(false);
+            }
+          },
+          prefill: {
+            name: user.name,
+            email: user.email,
+            contact: user.phone || ''
+          },
+          theme: {
+            color: '#4f46e5'
+          }
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.on('payment.failed', function () {
+           toast.error('Payment failed. Please try again.');
+        });
+        paymentObject.open();
+        
+      } else if (paymentMethod === 'Cash on Delivery') {
+        const finalTotal = (cartTotal - (couponApplied?.discountAmount || 0)).toFixed(2);
+        let message = `Hello! I would like to place a Cash on Delivery order.\n\n*Order Details:*\n`;
+        cartItems.forEach(item => {
+           message += `- ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)})\n`;
+        });
+        message += `\n*Total:* $${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
+        
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/916379981170?text=${encodedMessage}`, '_blank');
+        
+        setNewOrderId(orderRes.data._id);
+        setOrderComplete(true);
+        clearCart();
+        toast.success('Order placed successfully! Redirected to WhatsApp.');
+        setIsSubmitting(false);
+      } else {
+        // Fallback for any other methods
+        setNewOrderId(orderRes.data._id);
+        setOrderComplete(true);
+        clearCart();
+        toast.success('Order placed successfully!');
+        setIsSubmitting(false);
+      }
     } catch (error) {
-      toast.error('Error placing order');
+      console.error("Place order error:", error);
+      toast.error(error.response?.data?.message || 'Error placing order');
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (orderComplete) {
@@ -177,7 +289,6 @@ const CheckoutPage = () => {
               </div>
             )}
 
-            {selectedAddressIndex === -1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
                 <div className="col-span-2">
                   <Input
@@ -194,7 +305,7 @@ const CheckoutPage = () => {
                   name="city"
                   value={shippingAddress.city}
                   onChange={handleAddressChange}
-                  placeholder="New York"
+                  placeholder="Chennai"
                   required
                 />
                 <Input
@@ -202,21 +313,25 @@ const CheckoutPage = () => {
                   name="postalCode"
                   value={shippingAddress.postalCode}
                   onChange={handleAddressChange}
-                  placeholder="10001"
+                  placeholder="60001"
                   required
                 />
-                <div className="col-span-2">
-                  <Input
-                    label="Country"
-                    name="country"
-                    value={shippingAddress.country}
-                    onChange={handleAddressChange}
-                    placeholder="United States"
-                    required
-                  />
-                </div>
+                <Input
+                  label="Landmark (Optional)"
+                  name="landmark"
+                  value={shippingAddress.landmark}
+                  onChange={handleAddressChange}
+                  placeholder="Near Apollo Hospital"
+                />
+                <Input
+                  label="Country"
+                  name="country"
+                  value={shippingAddress.country}
+                  onChange={handleAddressChange}
+                  placeholder="Tamil Nadu"
+                  required
+                />
               </div>
-            )}
           </section>
 
           {/* Payment Method */}

@@ -24,3 +24,8 @@ export const validateCoupon = async (code, orderAmount) => {
   const response = await api.post('/coupons/validate', { code, orderAmount });
   return response.data;
 };
+
+export const verifyPayment = async (orderId, paymentData) => {
+  const response = await api.post(`/orders/${orderId}/verify-payment`, paymentData);
+  return response.data;
+};

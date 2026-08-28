@@ -7,6 +7,7 @@ import Button from '../../components/Button';
 import { ArrowLeft, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../../utils/getImageUrl';
+import { getCategories } from '../../services/categoryService';
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -15,13 +16,11 @@ const ProductForm = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    slug: '',
     description: '',
-    price: 0,
-    discountPrice: 0,
+    price: '',
+    discountPrice: '',
     category: '',
-    brand: '',
-    stock: 0,
+    stock: '',
     sku: '',
     images: [],
     isFeatured: false,
@@ -34,7 +33,15 @@ const ProductForm = () => {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-
+    const fetchCategoriesList = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (error) {
+        toast.error('Failed to load categories');
+      }
+    };
+    fetchCategoriesList();
 
     if (isEdit) {
       const fetchProduct = async () => {
@@ -42,12 +49,10 @@ const ProductForm = () => {
           const { data } = await api.get(`/products/${id}`);
           setFormData({
             name: data.name,
-            slug: data.slug,
             description: data.description,
             price: data.price,
             discountPrice: data.discountPrice,
-            category: data.category?.name || data.category,
-            brand: data.brand || '',
+            category: data.category?._id || data.category,
             stock: data.stock,
             sku: data.sku || '',
             images: data.images || [],
@@ -143,7 +148,23 @@ const ProductForm = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input label="Product Name" name="name" value={formData.name} onChange={handleChange} required />
-            <Input label="URL Slug" name="slug" value={formData.slug} onChange={handleChange} required />
+            
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-900 mb-1">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-white"
+                required
+              >
+                <option value="">Select a category</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            
             <div className="md:col-span-2">
               <label className="block text-sm font-bold text-gray-900 mb-2">Description</label>
               <textarea 
@@ -155,18 +176,14 @@ const ProductForm = () => {
                 required
               />
             </div>
-            
-            <Input label="Category" name="category" value={formData.category} onChange={handleChange} placeholder="e.g. Clothing" required />
-            
-            <Input label="Brand" name="brand" value={formData.brand} onChange={handleChange} />
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
           <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-2">Pricing & Inventory</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Input label="Price ($)" name="price" type="number" min="0" step="0.01" value={formData.price} onChange={handleChange} required />
-            <Input label="Discount Price ($)" name="discountPrice" type="number" min="0" step="0.01" value={formData.discountPrice} onChange={handleChange} />
+            <Input label="Price (₹)" name="price" type="number" min="0" step="0.01" value={formData.price} onChange={handleChange} required />
+            <Input label="Discount Price (₹)" name="discountPrice" type="number" min="0" step="0.01" value={formData.discountPrice} onChange={handleChange} />
             <Input label="Stock Quantity" name="stock" type="number" min="0" value={formData.stock} onChange={handleChange} required />
             <Input label="SKU" name="sku" value={formData.sku} onChange={handleChange} />
           </div>

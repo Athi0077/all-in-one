@@ -7,6 +7,32 @@ import ProductCard from '../components/ProductCard';
 import CategoryCard from '../components/CategoryCard';
 import { ProductSkeleton } from '../components/Skeleton';
 import Button from '../components/Button';
+const defaultCategories = [
+  {
+    _id: 'default-mens',
+    name: "Men's",
+    slug: 'mens',
+    image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    _id: 'default-womens',
+    name: "Women's",
+    slug: 'womens',
+    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    _id: 'default-kids',
+    name: "Kids",
+    slug: 'kids',
+    image: 'https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    _id: 'default-gifts',
+    name: "Gifts",
+    slug: 'gifts',
+    image: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&q=80&w=800'
+  }
+];
 
 const HomePage = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -121,11 +147,11 @@ const HomePage = () => {
           
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <div key={n} className="bg-gray-200 animate-pulse rounded-2xl aspect-[4/5] sm:aspect-square"></div>)}
+              {[1, 2, 3, 4].map(n => <div key={n} className="bg-gray-200 animate-pulse rounded-2xl aspect-[4/5] sm:aspect-square"></div>)}
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {categories.map(category => (
+              {defaultCategories.map(category => (
                 <CategoryCard key={category._id} category={category} />
               ))}
             </div>
