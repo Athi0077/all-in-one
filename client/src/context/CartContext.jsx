@@ -12,18 +12,19 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, qty = 1, size = null) => {
+  const addToCart = (product, qty = 1, size = null, imageIndex = 0) => {
     setCartItems(prevItems => {
-      const existItem = prevItems.find(x => x.product === product._id && x.size === size);
+      const existItem = prevItems.find(x => x.product === product._id && x.size === size && x.imageIndex === imageIndex);
       if (existItem) {
         return prevItems.map(x =>
-          (x.product === existItem.product && x.size === existItem.size) ? { ...existItem, qty: existItem.qty + qty } : x
+          (x.product === existItem.product && x.size === existItem.size && x.imageIndex === existItem.imageIndex) ? { ...existItem, qty: existItem.qty + qty } : x
         );
       } else {
         return [...prevItems, { 
           product: product._id, 
           name: product.name, 
-          image: product.images[0], 
+          image: product.images[imageIndex] || product.images[0], 
+          imageIndex,
           price: product.price,
           discountPrice: product.discountPrice > 0 ? product.discountPrice : null,
           shippingCharge: product.shippingCharge || 0,
@@ -35,14 +36,14 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const updateQty = (id, size, qty) => {
+  const updateQty = (id, size, imageIndex, qty) => {
     setCartItems(prevItems =>
-      prevItems.map(item => (item.product === id && item.size === size ? { ...item, qty } : item))
+      prevItems.map(item => (item.product === id && item.size === size && item.imageIndex === imageIndex ? { ...item, qty } : item))
     );
   };
 
-  const removeFromCart = (id, size) => {
-    setCartItems(prevItems => prevItems.filter(item => !(item.product === id && item.size === size)));
+  const removeFromCart = (id, size, imageIndex) => {
+    setCartItems(prevItems => prevItems.filter(item => !(item.product === id && item.size === size && item.imageIndex === imageIndex)));
   };
 
   const clearCart = () => {

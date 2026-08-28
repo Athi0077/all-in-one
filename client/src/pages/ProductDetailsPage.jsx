@@ -59,7 +59,7 @@ const ProductDetailsPage = () => {
       toast.error('Please select a size first');
       return;
     }
-    addToCart(product, qty, selectedSize);
+    addToCart(product, qty, selectedSize, activeImage);
     toast.success('Added to cart');
   };
 

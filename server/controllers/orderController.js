@@ -89,11 +89,19 @@ export const addOrderItems = async (req, res, next) => {
 
       // Send email if it's COD. Online payment sends after verifyPayment.
       if (paymentMethod === 'Cash on Delivery') {
+        const getOrdinalSuffix = (i) => {
+          const j = i % 10, k = i % 100;
+          if (j === 1 && k !== 11) return i + "st";
+          if (j === 2 && k !== 12) return i + "nd";
+          if (j === 3 && k !== 13) return i + "rd";
+          return i + "th";
+        };
         const itemsHtml = validatedItems.map(item => `
           <tr>
             <td style="padding: 12px; border-bottom: 1px solid #eee;">
               <strong>${item.name}</strong><br/>
               ${item.size ? `<small>Size: ${item.size}</small>` : ''}
+              ${typeof item.imageIndex === 'number' ? `<small style="margin-left:8px; color: #666;">[${getOrdinalSuffix(item.imageIndex + 1)} Image]</small>` : ''}
             </td>
             <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
             <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.qty).toFixed(2)}</td>
@@ -243,11 +251,20 @@ export const verifyOrderPayment = async (req, res, next) => {
 
       const updatedOrder = await order.save();
 
+      const getOrdinalSuffix = (i) => {
+        const j = i % 10, k = i % 100;
+        if (j === 1 && k !== 11) return i + "st";
+        if (j === 2 && k !== 12) return i + "nd";
+        if (j === 3 && k !== 13) return i + "rd";
+        return i + "th";
+      };
+
       const itemsHtml = order.items.map(item => `
         <tr>
           <td style="padding: 12px; border-bottom: 1px solid #eee;">
             <strong>${item.name}</strong><br/>
             ${item.size ? `<small>Size: ${item.size}</small>` : ''}
+            ${typeof item.imageIndex === 'number' ? `<small style="margin-left:8px; color: #666;">[${getOrdinalSuffix(item.imageIndex + 1)} Image]</small>` : ''}
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
           <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.qty).toFixed(2)}</td>
