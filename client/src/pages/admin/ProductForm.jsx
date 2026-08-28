@@ -32,6 +32,7 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [imageUrlInput, setImageUrlInput] = useState('');
 
   useEffect(() => {
     const fetchCategoriesList = async () => {
@@ -102,6 +103,13 @@ const ProductForm = () => {
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleAddImageUrl = () => {
+    if (!imageUrlInput.trim()) return;
+    setFormData(prev => ({ ...prev, images: [...prev.images, imageUrlInput.trim()] }));
+    setImageUrlInput('');
+    toast.success('Image URL added');
   };
 
   const handleSubmit = async (e) => {
@@ -221,7 +229,28 @@ const ProductForm = () => {
               )}
             </label>
           </div>
-          <p className="text-xs text-gray-500">Upload high-quality images. The first image will be used as the thumbnail.</p>
+          <p className="text-xs text-gray-500 mb-4">Upload high-quality images. The first image will be used as the thumbnail.</p>
+
+          <div className="flex flex-col gap-2 max-w-md">
+            <span className="text-sm font-medium text-gray-700">Or add image from URL:</span>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={imageUrlInput}
+                onChange={(e) => setImageUrlInput(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              />
+              <Button 
+                type="button"
+                onClick={handleAddImageUrl}
+                variant="outline"
+                className="px-4 py-2"
+              >
+                Add URL
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
