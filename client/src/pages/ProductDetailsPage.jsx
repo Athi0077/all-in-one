@@ -88,7 +88,8 @@ const ProductDetailsPage = () => {
       const data = await getProductAiSummary(id);
       setAiSummary(data.summary);
     } catch (error) {
-      toast.error('Failed to get AI summary');
+      console.error('AI Summary Error:', error);
+      toast.error(error.response?.data?.message || error.message || 'Failed to get AI summary');
     }
     setLoadingAi(false);
   };
@@ -212,6 +213,7 @@ const ProductDetailsPage = () => {
           <div className="mb-8">
             {!aiSummary ? (
               <Button 
+                type="button"
                 variant="outline" 
                 className="rounded-xl flex items-center gap-2 border-primary text-primary hover:bg-primary/5"
                 onClick={handleAskAi}

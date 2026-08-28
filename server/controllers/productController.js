@@ -215,14 +215,22 @@ Description: ${product.description}`;
     });
 
     if (!response.ok) {
-      throw new Error('Failed to communicate with AI provider');
+      const errText = await response.text();
+      console.error('OpenRouter error:', errText);
+      throw new Error(`Failed to communicate with AI provider: ${response.status}`);
     }
 
     const data = await response.json();
+    if (!data.choices || !data.choices[0]) {
+      console.error('Unexpected OpenRouter response:', data);
+      throw new Error('AI provider returned an unexpected response format');
+    }
+    
     const summary = data.choices[0].message.content;
 
     res.json({ summary });
   } catch (error) {
+    console.error('getProductAiSummary error:', error);
     next(error);
   }
 };
