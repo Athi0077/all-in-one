@@ -160,7 +160,7 @@ const CheckoutPage = () => {
         }
 
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TV7hXMB718ABCh',
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TV7hXMB718NUCg',
           amount: Math.round((cartTotal - (couponApplied?.discountAmount || 0)) * 100),
           currency: 'INR',
           name: 'All in One Store',

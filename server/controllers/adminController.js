@@ -99,8 +99,11 @@ export const getAdminProducts = async (req, res, next) => {
 // @access  Private/Admin
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
+    let { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
 
+    if (!slug && name) {
+      slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
     if (Number(price) < 0 || Number(discountPrice) < 0 || Number(stock) < 0) {
       res.status(400);
       throw new Error('Price and stock cannot be negative');
@@ -137,8 +140,11 @@ export const createProduct = async (req, res, next) => {
 // @access  Private/Admin
 export const updateProduct = async (req, res, next) => {
   try {
-    const { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
+    let { name, slug, description, price, discountPrice, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
 
+    if (!slug && name) {
+      slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
     if (Number(price) < 0 || Number(discountPrice) < 0 || Number(stock) < 0) {
       res.status(400);
       throw new Error('Price and stock cannot be negative');
