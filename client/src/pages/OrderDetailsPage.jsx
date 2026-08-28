@@ -156,6 +156,9 @@ const OrderDetailsPage = () => {
                     <Link to={`/products/${item.product}`} className="font-bold text-gray-900 hover:text-primary transition-colors line-clamp-2 mb-1">
                       {item.name}
                     </Link>
+                    {item.size && (
+                      <p className="text-sm text-gray-500 mb-1">Size: {item.size}</p>
+                    )}
                     <p className="text-sm text-gray-500">Qty: {item.qty}</p>
                   </div>
                   <div className="text-right font-bold text-gray-900 whitespace-nowrap flex flex-col items-end gap-2">

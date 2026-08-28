@@ -30,6 +30,7 @@ const ProductDetailsPage = () => {
   const { addToCart } = useContext(CartContext);
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
   const { user } = useContext(AuthContext);
+  const [selectedSize, setSelectedSize] = useState('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -54,7 +55,11 @@ const ProductDetailsPage = () => {
   }, [id, navigate]);
 
   const handleAddToCart = () => {
-    addToCart(product, qty);
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      toast.error('Please select a size first');
+      return;
+    }
+    addToCart(product, qty, selectedSize);
     toast.success('Added to cart');
   };
 
@@ -255,6 +260,26 @@ const ProductDetailsPage = () => {
               </div>
             )}
           </div>
+
+          {/* Size Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-gray-900">Select Size</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {product.sizes.map(size => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`h-12 min-w-[3rem] px-4 rounded-xl border-2 font-bold text-sm transition-all ${selectedSize === size ? 'border-primary bg-primary text-white shadow-md' : 'border-gray-200 text-gray-700 hover:border-primary'}`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="border-t border-b border-gray-100 py-6 mb-8 flex flex-col sm:flex-row gap-6">
             {/* Quantity Selector */}

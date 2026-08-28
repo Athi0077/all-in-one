@@ -3,6 +3,7 @@ import Order from '../models/orderModel.js';
 import Coupon from '../models/couponModel.js';
 import { validateAndCalculateStock, decrementStock, restoreStock } from '../services/inventoryService.js';
 import { createPayment, verifyPayment } from '../services/paymentService.js';
+import { sendEmail } from '../services/emailService.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -85,6 +86,66 @@ export const addOrderItems = async (req, res, next) => {
 
       await session.commitTransaction();
       session.endSession();
+
+      // Send email if it's COD. Online payment sends after verifyPayment.
+      if (paymentMethod === 'Cash on Delivery') {
+        const itemsHtml = validatedItems.map(item => `
+          <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">
+              <strong>${item.name}</strong><br/>
+              ${item.size ? `<small>Size: ${item.size}</small>` : ''}
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.qty).toFixed(2)}</td>
+          </tr>
+        `).join('');
+        
+        const html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+            <div style="text-align: center; padding: 20px; background-color: #4f46e5; color: white; border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; font-size: 24px;">Order Confirmed!</h1>
+            </div>
+            <div style="padding: 20px; background-color: #f9fafb; border: 1px solid #eee; border-top: none;">
+              <p>Hi ${req.user.name},</p>
+              <p>Thank you for shopping with AllinOne Store! Your Cash on Delivery order <strong>#${createdOrder._id.toString().substring(0, 8)}</strong> has been confirmed.</p>
+              
+              <h3 style="margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Details</h3>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                  <tr style="background-color: #f3f4f6; text-align: left;">
+                    <th style="padding: 12px;">Item</th>
+                    <th style="padding: 12px; text-align: center;">Qty</th>
+                    <th style="padding: 12px; text-align: right;">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemsHtml}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2" style="padding: 12px; text-align: right;"><strong>Subtotal</strong></td>
+                    <td style="padding: 12px; text-align: right;">$${createdOrder.subtotal.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="padding: 12px; text-align: right;"><strong>Shipping</strong></td>
+                    <td style="padding: 12px; text-align: right;">$${createdOrder.shippingCharge.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="padding: 12px; text-align: right; font-size: 18px;"><strong>Total</strong></td>
+                    <td style="padding: 12px; text-align: right; font-size: 18px;"><strong>$${createdOrder.total.toFixed(2)}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        `;
+        
+        sendEmail({
+          to: req.user.email,
+          subject: \`Order Confirmation #\${createdOrder._id.toString().substring(0, 8)}\`,
+          html
+        }).catch(err => console.error("Email send failed:", err));
+      }
 
       res.status(201).json({
         success: true,
@@ -181,6 +242,63 @@ export const verifyOrderPayment = async (req, res, next) => {
       };
 
       const updatedOrder = await order.save();
+
+      const itemsHtml = order.items.map(item => `
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">
+            <strong>${item.name}</strong><br/>
+            ${item.size ? `<small>Size: ${item.size}</small>` : ''}
+          </td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.qty}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">$${(item.price * item.qty).toFixed(2)}</td>
+        </tr>
+      `).join('');
+      
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+          <div style="text-align: center; padding: 20px; background-color: #4f46e5; color: white; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">Payment Successful & Order Confirmed!</h1>
+          </div>
+          <div style="padding: 20px; background-color: #f9fafb; border: 1px solid #eee; border-top: none;">
+            <p>Hi ${req.user.name},</p>
+            <p>We have successfully received your payment! Your order <strong>#${updatedOrder._id.toString().substring(0, 8)}</strong> has been confirmed.</p>
+            
+            <h3 style="margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Details</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+              <thead>
+                <tr style="background-color: #f3f4f6; text-align: left;">
+                  <th style="padding: 12px;">Item</th>
+                  <th style="padding: 12px; text-align: center;">Qty</th>
+                  <th style="padding: 12px; text-align: right;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" style="padding: 12px; text-align: right;"><strong>Subtotal</strong></td>
+                  <td style="padding: 12px; text-align: right;">$${updatedOrder.subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding: 12px; text-align: right;"><strong>Shipping</strong></td>
+                  <td style="padding: 12px; text-align: right;">$${updatedOrder.shippingCharge.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding: 12px; text-align: right; font-size: 18px;"><strong>Total Paid</strong></td>
+                  <td style="padding: 12px; text-align: right; font-size: 18px; color: #16a34a;"><strong>$${updatedOrder.total.toFixed(2)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      `;
+      
+      sendEmail({
+        to: req.user.email,
+        subject: \`Order Confirmation #\${updatedOrder._id.toString().substring(0, 8)}\`,
+        html
+      }).catch(err => console.error("Email send failed:", err));
 
       res.json({ success: true, data: updatedOrder });
     } else {

@@ -205,7 +205,8 @@ const CheckoutPage = () => {
         const finalTotal = (cartTotal + cartShipping - (couponApplied?.discountAmount || 0)).toFixed(2);
         let message = `Hello! I would like to place a Cash on Delivery order.\n\n*Order Details:*\n`;
         cartItems.forEach(item => {
-           message += `- ${item.name} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
+           const sizeStr = item.size ? ` (Size: ${item.size})` : '';
+           message += `- ${item.name}${sizeStr} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
         });
         message += `\n*Total:* $${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
         

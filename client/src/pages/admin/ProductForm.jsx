@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 import { getImageUrl } from '../../utils/getImageUrl';
 import { getCategories } from '../../services/categoryService';
 
+const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
+
 const ProductForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ const ProductForm = () => {
     shippingCharge: '',
     category: '',
     color: '',
+    sizes: [],
     stock: '',
     sku: '',
     images: [],
@@ -58,6 +61,7 @@ const ProductForm = () => {
             shippingCharge: data.shippingCharge || '',
             category: data.category?._id || data.category,
             color: data.color || '',
+            sizes: data.sizes || [],
             stock: data.stock,
             sku: data.sku || '',
             images: data.images || [],
@@ -79,6 +83,15 @@ const ProductForm = () => {
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSizeToggle = (size) => {
+    setFormData(prev => ({
+      ...prev,
+      sizes: prev.sizes.includes(size)
+        ? prev.sizes.filter(s => s !== size)
+        : [...prev.sizes, size]
     }));
   };
 
@@ -199,6 +212,22 @@ const ProductForm = () => {
                 <option value="Brown">Brown</option>
                 <option value="Cyan">Cyan</option>
               </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">Available Sizes (Optional)</label>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABLE_SIZES.map(size => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeToggle(size)}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors border ${formData.sizes.includes(size) ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-primary'}`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
             
             <div className="md:col-span-2">

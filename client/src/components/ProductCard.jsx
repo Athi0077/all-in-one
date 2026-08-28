@@ -5,11 +5,14 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { getImageUrl } from '../utils/getImageUrl';
 import toast from 'react-hot-toast';
+import { Eye } from 'lucide-react';
+import QuickViewModal from './QuickViewModal';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
   const navigate = useNavigate();
+  const [showQuickView, setShowQuickView] = React.useState(false);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -44,13 +47,23 @@ const ProductCard = ({ product }) => {
         )}
       </div>
 
-      {/* Wishlist Button */}
-      <button 
-        onClick={handleWishlist}
-        className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-500 hover:text-red-500 transition-colors"
-      >
-        <Heart size={20} className={isWished ? "fill-red-500 text-red-500" : ""} />
-      </button>
+      <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+        {/* Wishlist Button */}
+        <button 
+          onClick={handleWishlist}
+          className="p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-500 hover:text-red-500 transition-colors shadow-sm"
+        >
+          <Heart size={20} className={isWished ? "fill-red-500 text-red-500" : ""} />
+        </button>
+        {/* Quick View Button */}
+        <button 
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowQuickView(true); }}
+          className="p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-500 hover:text-primary transition-colors shadow-sm"
+          title="Quick View"
+        >
+          <Eye size={20} />
+        </button>
+      </div>
 
       {/* Image */}
       <Link to={`/products/${product._id}`} className="block relative pt-[100%] overflow-hidden bg-gray-100">
@@ -97,6 +110,13 @@ const ProductCard = ({ product }) => {
           </button>
         </div>
       </div>
+
+      {showQuickView && (
+        <QuickViewModal 
+          product={product} 
+          onClose={() => setShowQuickView(false)} 
+        />
+      )}
     </div>
   );
 };
