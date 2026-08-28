@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getProductById, createProductReview, getProductReviews } from '../services/productService';
+import { getProductById, createProductReview, getProductReviews, getProductAiSummary } from '../services/productService';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext';
-import { ShieldCheck, Truck, RotateCcw, Heart, Share2, Star, Minus, Plus, MessageSquare } from 'lucide-react';
+import { ShieldCheck, Truck, RotateCcw, Heart, Share2, Star, Minus, Plus, MessageSquare, Sparkles } from 'lucide-react';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
@@ -22,6 +22,8 @@ const ProductDetailsPage = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+  const [loadingAi, setLoadingAi] = useState(false);
 
   const { addToCart } = useContext(CartContext);
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
@@ -77,6 +79,18 @@ const ProductDetailsPage = () => {
       toast.error(error.response?.data?.message || 'Failed to submit review');
     }
     setSubmittingReview(false);
+  };
+
+  const handleAskAi = async () => {
+    if (aiSummary) return; // Already fetched
+    setLoadingAi(true);
+    try {
+      const data = await getProductAiSummary(id);
+      setAiSummary(data.summary);
+    } catch (error) {
+      toast.error('Failed to get AI summary');
+    }
+    setLoadingAi(false);
   };
 
   if (loading) {
@@ -190,9 +204,30 @@ const ProductDetailsPage = () => {
             )}
           </div>
 
-          <p className="text-gray-600 text-lg leading-relaxed mb-8">
+          <p className="text-gray-600 text-lg leading-relaxed mb-6">
             {product.description}
           </p>
+
+          {/* AI Summary Section */}
+          <div className="mb-8">
+            {!aiSummary ? (
+              <Button 
+                variant="outline" 
+                className="rounded-xl flex items-center gap-2 border-primary text-primary hover:bg-primary/5"
+                onClick={handleAskAi}
+                isLoading={loadingAi}
+              >
+                <Sparkles size={18} /> Ask AI about this product
+              </Button>
+            ) : (
+              <div className="bg-primary/5 border border-primary/20 p-4 rounded-2xl flex gap-3 items-start">
+                <Sparkles size={24} className="text-primary shrink-0 mt-1" />
+                <p className="text-gray-700 italic leading-relaxed text-sm">
+                  "{aiSummary}"
+                </p>
+              </div>
+            )}
+          </div>
 
           <div className="border-t border-b border-gray-100 py-6 mb-8 flex flex-col sm:flex-row gap-6">
             {/* Quantity Selector */}

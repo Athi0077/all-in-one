@@ -179,3 +179,50 @@ export const getProductReviews = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get AI summary for a product
+// @route   GET /api/products/:id/ai-summary
+// @access  Public
+export const getProductAiSummary = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404);
+      throw new Error('Product not found');
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      res.status(500);
+      throw new Error('AI service is not configured');
+    }
+
+    const prompt = `Write a very brief, compelling, and engaging 2 to 3 line summary about the following product. Only return the summary text without any quotes or extra formatting.
+Product Name: ${product.name}
+Brand: ${product.brand || 'Generic'}
+Description: ${product.description}`;
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to communicate with AI provider');
+    }
+
+    const data = await response.json();
+    const summary = data.choices[0].message.content;
+
+    res.json({ summary });
+  } catch (error) {
+    next(error);
+  }
+};
