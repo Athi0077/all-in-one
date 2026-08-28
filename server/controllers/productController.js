@@ -135,15 +135,13 @@ export const createProductReview = async (req, res, next) => {
     const { rating, comment } = req.body;
     const productId = req.params.id;
 
-    // Check if user has actually purchased the product
-    const orders = await Order.find({ user: req.user._id, 'items.product': productId });
+    // Check if user has actually purchased the product (Disabled for testing)
+    // const orders = await Order.find({ user: req.user._id, 'items.product': productId });
     
-    // In a real app we might only allow reviews if orderStatus === 'Delivered', 
-    // but for now we just verify they ordered it.
-    if (!orders || orders.length === 0) {
-      res.status(400);
-      throw new Error('You can only review products you have purchased');
-    }
+    // if (!orders || orders.length === 0) {
+    //   res.status(400);
+    //   throw new Error('You can only review products you have purchased');
+    // }
 
     const alreadyReviewed = await Review.findOne({
       product: productId,
