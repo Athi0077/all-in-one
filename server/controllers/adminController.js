@@ -99,7 +99,7 @@ export const getAdminProducts = async (req, res, next) => {
 // @access  Private/Admin
 export const createProduct = async (req, res, next) => {
   try {
-    let { name, slug, description, price, discountPrice, shippingCharge, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
+    let { name, slug, description, price, discountPrice, shippingCharge, category, brand, color, stock, sku, images, isFeatured, isActive } = req.body;
 
     if (!slug && name) {
       slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -125,7 +125,7 @@ export const createProduct = async (req, res, next) => {
     }
 
     const product = new Product({
-      name, slug, description, price, discountPrice, shippingCharge: shippingCharge || 0, category: categoryId, brand, stock, sku, images, isFeatured, isActive
+      name, slug, description, price, discountPrice, shippingCharge: shippingCharge || 0, category: categoryId, brand, color, stock, sku, images, isFeatured, isActive
     });
 
     const createdProduct = await product.save();
@@ -140,7 +140,7 @@ export const createProduct = async (req, res, next) => {
 // @access  Private/Admin
 export const updateProduct = async (req, res, next) => {
   try {
-    let { name, slug, description, price, discountPrice, shippingCharge, category, brand, stock, sku, images, isFeatured, isActive } = req.body;
+    let { name, slug, description, price, discountPrice, shippingCharge, category, brand, color, stock, sku, images, isFeatured, isActive } = req.body;
 
     if (!slug && name) {
       slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -176,6 +176,7 @@ export const updateProduct = async (req, res, next) => {
       product.shippingCharge = shippingCharge || 0;
       product.category = categoryId;
       product.brand = brand;
+      product.color = color;
       product.stock = stock;
       product.sku = sku;
       if (images && images.length > 0) {

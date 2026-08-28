@@ -21,6 +21,7 @@ const ProductForm = () => {
     discountPrice: '',
     shippingCharge: '',
     category: '',
+    color: '',
     stock: '',
     sku: '',
     images: [],
@@ -56,6 +57,7 @@ const ProductForm = () => {
             discountPrice: data.discountPrice || '',
             shippingCharge: data.shippingCharge || '',
             category: data.category?._id || data.category,
+            color: data.color || '',
             stock: data.stock,
             sku: data.sku || '',
             images: data.images || [],
@@ -172,6 +174,30 @@ const ProductForm = () => {
                 {categories.map((c) => (
                   <option key={c._id} value={c._id}>{c.name}</option>
                 ))}
+              </select>
+            </div>
+
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-900 mb-1">Color (Optional)</label>
+              <select
+                name="color"
+                value={formData.color}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-white"
+              >
+                <option value="">Select a color</option>
+                <option value="Red">Red</option>
+                <option value="Blue">Blue</option>
+                <option value="Green">Green</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Orange">Orange</option>
+                <option value="Purple">Purple</option>
+                <option value="Pink">Pink</option>
+                <option value="Black">Black</option>
+                <option value="White">White</option>
+                <option value="Gray">Gray</option>
+                <option value="Brown">Brown</option>
+                <option value="Cyan">Cyan</option>
               </select>
             </div>
             

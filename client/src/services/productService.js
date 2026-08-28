@@ -1,11 +1,11 @@
 import api from './api';
 
-export const getProducts = async (keyword = '', pageNumber = 1, category = '', minPrice = '', maxPrice = '', rating = '', sort = '') => {
+export const getProducts = async (keyword = '', pageNumber = 1, category = '', minPrice = '', maxPrice = '', color = '', sort = '') => {
   let url = `/products?keyword=${keyword}&page=${pageNumber}`;
   if (category) url += `&category=${category}`;
   if (minPrice) url += `&minPrice=${minPrice}`;
   if (maxPrice) url += `&maxPrice=${maxPrice}`;
-  if (rating) url += `&rating=${rating}`;
+  if (color) url += `&color=${color}`;
   if (sort) url += `&sort=${sort}`;
   
   const response = await api.get(url);

@@ -41,6 +41,9 @@ const productSchema = mongoose.Schema(
     brand: {
       type: String,
     },
+    color: {
+      type: String,
+    },
     stock: {
       type: Number,
       required: true,

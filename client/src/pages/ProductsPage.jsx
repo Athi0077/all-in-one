@@ -8,6 +8,21 @@ import { Filter, Search, X } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import { Search as SearchIcon } from 'lucide-react';
 
+const COLORS = [
+  { name: 'Red', hex: '#ef4444' },
+  { name: 'Blue', hex: '#3b82f6' },
+  { name: 'Green', hex: '#22c55e' },
+  { name: 'Yellow', hex: '#eab308' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Purple', hex: '#a855f7' },
+  { name: 'Pink', hex: '#ec4899' },
+  { name: 'Black', hex: '#000000' },
+  { name: 'White', hex: '#ffffff' },
+  { name: 'Gray', hex: '#6b7280' },
+  { name: 'Brown', hex: '#8b4513' },
+  { name: 'Cyan', hex: '#06b6d4' }
+];
+
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [categoriesList, setCategoriesList] = useState([]);
@@ -24,14 +39,14 @@ const ProductsPage = () => {
   const keyword = searchParams.get('keyword') || '';
   const category = searchParams.get('category') || '';
   const sort = searchParams.get('sort') || '';
-  const rating = searchParams.get('rating') || '';
+  const color = searchParams.get('color') || '';
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
         const [data, categoriesData] = await Promise.all([
-          getProducts(keyword, page, category, '', '', rating, sort),
+          getProducts(keyword, page, category, '', '', color, sort),
           getCategories()
         ]);
         setProducts(data.products);
@@ -46,7 +61,7 @@ const ProductsPage = () => {
 
     fetchProducts();
     window.scrollTo(0, 0);
-  }, [keyword, page, category, sort, rating]);
+  }, [keyword, page, category, sort, color]);
 
   const handleSortChange = (e) => {
     const newSort = e.target.value;
@@ -121,7 +136,7 @@ const ProductsPage = () => {
           <div className="space-y-8">
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-gray-900">Filters</h3>
-              {(category || rating) && (
+              {(category || color) && (
                 <button onClick={clearFilters} className="text-sm text-primary hover:underline">Clear All</button>
               )}
             </div>
@@ -147,28 +162,19 @@ const ProductsPage = () => {
               </div>
             </div>
 
-            {/* Rating Filter */}
+            {/* Color Filter */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">Rating</h4>
-              <div className="space-y-2">
-                {[4, 3, 2, 1].map((rate) => (
-                  <label key={rate} className="flex items-center gap-3 cursor-pointer">
-                    <input 
-                      type="radio" 
-                      name="rating"
-                      checked={rating === rate.toString()}
-                      onChange={() => handleFilterChange('rating', rate.toString())}
-                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300" 
-                    />
-                    <span className={`text-sm flex items-center gap-1 ${rating === rate.toString() ? 'font-semibold text-primary' : 'text-gray-600'}`}>
-                      {[...Array(5)].map((_, i) => (
-                        <svg key={i} className={`w-4 h-4 ${i < rate ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current'}`} viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                      & Up
-                    </span>
-                  </label>
+              <h4 className="font-semibold text-gray-900 mb-3">Color</h4>
+              <div className="grid grid-cols-6 gap-3">
+                {COLORS.map((c) => (
+                  <button
+                    key={c.name}
+                    onClick={() => handleFilterChange('color', color === c.name ? '' : c.name)}
+                    className={`w-8 h-8 rounded-full border-2 focus:outline-none transition-all ${color === c.name ? 'border-primary scale-110 shadow-md' : 'border-gray-200 hover:scale-110'}`}
+                    style={{ backgroundColor: c.hex }}
+                    title={c.name}
+                    aria-label={`Filter by ${c.name}`}
+                  />
                 ))}
               </div>
             </div>

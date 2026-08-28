@@ -40,6 +40,10 @@ export const getProducts = async (req, res, next) => {
       query.rating = { $gte: Number(req.query.rating) };
     }
 
+    if (req.query.color) {
+      query.color = req.query.color;
+    }
+
     // Sort
     let sortObj = { createdAt: -1 };
     if (req.query.sort) {
