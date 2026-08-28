@@ -401,6 +401,7 @@ const ProductDetailsPage = () => {
                 )}
              </div>
            </div>
+        </div>
       </div>
 
       {/* Related Products Section */}
