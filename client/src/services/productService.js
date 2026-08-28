@@ -41,3 +41,8 @@ export const getProductAiSummary = async (id) => {
   const response = await api.get(`/products/${id}/ai-summary`);
   return response.data;
 };
+
+export const getRelatedProducts = async (id) => {
+  const response = await api.get(`/products/${id}/related`);
+  return response.data;
+};

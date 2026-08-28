@@ -238,3 +238,28 @@ Description: ${product.description}`;
     next(error);
   }
 };
+
+// @desc    Get related products
+// @route   GET /api/products/:id/related
+// @access  Public
+export const getRelatedProducts = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      res.status(404);
+      throw new Error('Product not found');
+    }
+
+    const relatedProducts = await Product.find({
+      _id: { $ne: product._id },
+      category: product.category,
+      isActive: true
+    })
+      .populate('category', 'name slug')
+      .limit(4);
+
+    res.json(relatedProducts);
+  } catch (error) {
+    next(error);
+  }
+};

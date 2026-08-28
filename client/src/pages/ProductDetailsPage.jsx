@@ -9,6 +9,8 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../utils/getImageUrl';
+import RelatedProducts from '../components/RelatedProducts';
+import { Helmet } from 'react-helmet-async';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -137,6 +139,10 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <Helmet>
+        <title>{product.name} - AllinOne Store</title>
+        <meta name="description" content={product.description?.substring(0, 150)} />
+      </Helmet>
       {/* Breadcrumbs */}
       <nav className="text-sm mb-8" aria-label="Breadcrumb">
         <ol className="list-none p-0 inline-flex">
@@ -395,8 +401,10 @@ const ProductDetailsPage = () => {
                 )}
              </div>
            </div>
-        </div>
       </div>
+
+      {/* Related Products Section */}
+      <RelatedProducts productId={product._id} />
     </div>
   );
 };

@@ -6,7 +6,8 @@ import {
   getProductsByCategory,
   createProductReview,
   getProductReviews,
-  getProductAiSummary
+  getProductAiSummary,
+  getRelatedProducts
 } from '../controllers/productController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -17,6 +18,7 @@ router.route('/featured').get(getFeaturedProducts);
 router.route('/category/:slug').get(getProductsByCategory);
 router.route('/:id').get(getProductById);
 router.route('/:id/ai-summary').get(getProductAiSummary);
+router.route('/:id/related').get(getRelatedProducts);
 router.route('/:id/reviews').get(getProductReviews).post(protect, createProductReview);
 
 export default router;
