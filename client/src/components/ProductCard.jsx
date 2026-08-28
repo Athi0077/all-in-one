@@ -13,6 +13,16 @@ const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
   const navigate = useNavigate();
   const [showQuickView, setShowQuickView] = React.useState(false);
+  const [currentImgIndex, setCurrentImgIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    if (product.images && product.images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImgIndex((prev) => (prev === 0 ? 1 : 0));
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [product.images]);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -68,9 +78,9 @@ const ProductCard = ({ product }) => {
       {/* Image */}
       <Link to={`/products/${product._id}`} className="block relative pt-[100%] overflow-hidden bg-gray-100">
         <img 
-          src={getImageUrl(product.images?.[0])} 
+          src={getImageUrl(product.images?.[currentImgIndex] || product.images?.[0])} 
           alt={product.name} 
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-in-out"
         />
       </Link>
 
