@@ -78,10 +78,17 @@ const ProductCard = ({ product }) => {
       {/* Image */}
       <Link to={`/products/${product._id}`} className="block relative pt-[100%] overflow-hidden bg-gray-100">
         <img 
-          src={getImageUrl(product.images?.[currentImgIndex] || product.images?.[0])} 
+          src={getImageUrl(product.images?.[0])} 
           alt={product.name} 
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-in-out"
+          className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out group-hover:scale-105 ${currentImgIndex === 0 ? 'opacity-100' : 'opacity-0'}`}
         />
+        {product.images?.length > 1 && (
+          <img 
+            src={getImageUrl(product.images?.[1])} 
+            alt={product.name} 
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out group-hover:scale-105 ${currentImgIndex === 1 ? 'opacity-100' : 'opacity-0'}`}
+          />
+        )}
       </Link>
 
       {/* Content */}
