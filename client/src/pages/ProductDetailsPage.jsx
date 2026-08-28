@@ -94,6 +94,25 @@ const ProductDetailsPage = () => {
     setLoadingAi(false);
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Check out ${product.name} on AllinOne Store!`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -171,7 +190,7 @@ const ProductDetailsPage = () => {
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-bold text-primary tracking-wider uppercase">{product.brand}</span>
             <div className="flex gap-2">
-              <button className="text-gray-400 hover:text-gray-900 p-2"><Share2 size={20} /></button>
+              <button onClick={handleShare} className="text-gray-400 hover:text-gray-900 p-2"><Share2 size={20} /></button>
               <button 
                 className="text-gray-400 hover:text-red-500 p-2"
                 onClick={() => toggleWishlist(product)}
