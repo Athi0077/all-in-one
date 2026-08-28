@@ -24,6 +24,10 @@ const productSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    shippingCharge: {
+      type: Number,
+      default: 0,
+    },
     images: [
       {
         type: String,

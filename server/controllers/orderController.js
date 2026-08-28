@@ -55,7 +55,7 @@ export const addOrderItems = async (req, res, next) => {
       }
 
       // 3. Calculate Final Totals
-      const shippingCharge = subtotal > 100 ? 0 : 10; // Simple logic: free shipping over $100
+      const shippingCharge = validatedItems.reduce((acc, item) => acc + (item.shippingCharge || 0) * item.qty, 0);
       const total = subtotal - discount + shippingCharge;
 
       // 4. Create Order

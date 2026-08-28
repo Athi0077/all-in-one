@@ -8,7 +8,7 @@ import EmptyState from '../components/EmptyState';
 import { getImageUrl } from '../utils/getImageUrl';
 
 const CartPage = () => {
-  const { cartItems, updateQty, removeFromCart, cartTotal } = useContext(CartContext);
+  const { cartItems, updateQty, removeFromCart, cartTotal, cartShipping } = useContext(CartContext);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -63,7 +63,12 @@ const CartPage = () => {
                       <Link to={`/products/${item.product}`} className="font-semibold text-gray-900 hover:text-primary transition-colors text-base sm:text-lg line-clamp-2">
                         {item.name}
                       </Link>
-                      <p className="text-gray-500 mt-1 sm:hidden">${item.price.toFixed(2)}</p>
+                      <div className="mt-1 sm:hidden flex flex-wrap items-baseline gap-1.5">
+                        <span className="text-gray-900 font-bold">${(item.discountPrice || item.price).toFixed(2)}</span>
+                        {item.discountPrice && (
+                          <span className="text-xs text-gray-500 line-through">${item.price.toFixed(2)}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
@@ -88,8 +93,11 @@ const CartPage = () => {
                   </div>
                   
                   {/* Price */}
-                  <div className="hidden sm:block col-span-2 text-right font-bold text-gray-900">
-                    ${(item.price * item.qty).toFixed(2)}
+                  <div className="hidden sm:block col-span-2 text-right">
+                    <div className="font-bold text-gray-900">${(item.qty * (item.discountPrice || item.price)).toFixed(2)}</div>
+                    {item.discountPrice && (
+                      <div className="text-xs text-gray-500 line-through">${(item.qty * item.price).toFixed(2)}</div>
+                    )}
                   </div>
                   
                   {/* Remove */}
@@ -119,7 +127,7 @@ const CartPage = () => {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-gray-900 text-green-600">Free</span>
+                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `$${cartShipping.toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
@@ -129,7 +137,7 @@ const CartPage = () => {
             
             <div className="border-t border-gray-200 pt-4 mb-6 flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${cartTotal.toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">${(cartTotal + cartShipping).toFixed(2)}</span>
             </div>
             
             <Button 

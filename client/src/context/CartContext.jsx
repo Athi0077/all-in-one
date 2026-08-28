@@ -24,7 +24,9 @@ export const CartProvider = ({ children }) => {
           product: product._id, 
           name: product.name, 
           image: product.images[0], 
-          price: product.price || product.discountPrice, // Using price
+          price: product.price,
+          discountPrice: product.discountPrice > 0 ? product.discountPrice : null,
+          shippingCharge: product.shippingCharge || 0,
           stock: product.stock,
           qty 
         }];
@@ -46,11 +48,12 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
-  const cartTotal = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
+  const cartTotal = cartItems.reduce((acc, item) => acc + item.qty * (item.discountPrice || item.price), 0);
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
+  const cartShipping = cartItems.reduce((acc, item) => acc + (item.shippingCharge || 0) * item.qty, 0);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateQty, removeFromCart, clearCart, cartTotal, cartCount }}>
+    <CartContext.Provider value={{ cartItems, addToCart, updateQty, removeFromCart, clearCart, cartTotal, cartCount, cartShipping }}>
       {children}
     </CartContext.Provider>
   );

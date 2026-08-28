@@ -19,6 +19,7 @@ const ProductForm = () => {
     description: '',
     price: '',
     discountPrice: '',
+    shippingCharge: '',
     category: '',
     stock: '',
     sku: '',
@@ -51,7 +52,8 @@ const ProductForm = () => {
             name: data.name,
             description: data.description,
             price: data.price,
-            discountPrice: data.discountPrice,
+            discountPrice: data.discountPrice || '',
+            shippingCharge: data.shippingCharge || '',
             category: data.category?._id || data.category,
             stock: data.stock,
             sku: data.sku || '',
@@ -184,6 +186,7 @@ const ProductForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Input label="Price (₹)" name="price" type="number" min="0" step="0.01" value={formData.price} onChange={handleChange} required />
             <Input label="Discount Price (₹)" name="discountPrice" type="number" min="0" step="0.01" value={formData.discountPrice} onChange={handleChange} />
+            <Input label="Shipping Charge (₹)" name="shippingCharge" type="number" min="0" step="0.01" value={formData.shippingCharge} onChange={handleChange} />
             <Input label="Stock Quantity" name="stock" type="number" min="0" value={formData.stock} onChange={handleChange} required />
             <Input label="SKU" name="sku" value={formData.sku} onChange={handleChange} />
           </div>

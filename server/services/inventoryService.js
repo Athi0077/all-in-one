@@ -29,6 +29,7 @@ export const validateAndCalculateStock = async (orderItems, session) => {
     validatedItems.push({
       ...item,
       price: priceToUse,
+      shippingCharge: product.shippingCharge || 0,
     });
   }
 

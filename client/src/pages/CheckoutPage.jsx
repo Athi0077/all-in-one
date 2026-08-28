@@ -11,7 +11,7 @@ import { CheckCircle2, Tag } from 'lucide-react';
 import { getImageUrl } from '../utils/getImageUrl';
 
 const CheckoutPage = () => {
-  const { cartItems, cartTotal, clearCart } = useContext(CartContext);
+  const { cartItems, cartTotal, clearCart, cartShipping } = useContext(CartContext);
   const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -202,10 +202,10 @@ const CheckoutPage = () => {
         paymentObject.open();
         
       } else if (paymentMethod === 'Cash on Delivery') {
-        const finalTotal = (cartTotal - (couponApplied?.discountAmount || 0)).toFixed(2);
+        const finalTotal = (cartTotal + cartShipping - (couponApplied?.discountAmount || 0)).toFixed(2);
         let message = `Hello! I would like to place a Cash on Delivery order.\n\n*Order Details:*\n`;
         cartItems.forEach(item => {
-           message += `- ${item.name} x ${item.qty} ($${(item.price * item.qty).toFixed(2)})\n`;
+           message += `- ${item.name} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
         });
         message += `\n*Total:* $${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
         
@@ -376,7 +376,12 @@ const CheckoutPage = () => {
                   <img src={getImageUrl(item.image)} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-gray-900 line-clamp-2">{item.name}</h4>
-                    <p className="text-sm text-gray-500">{item.qty} x ${item.price.toFixed(2)}</p>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="text-sm font-medium text-gray-900">{item.qty} x ${(item.discountPrice || item.price).toFixed(2)}</p>
+                      {item.discountPrice && (
+                        <p className="text-xs text-gray-500 line-through">${item.price.toFixed(2)}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -412,13 +417,13 @@ const CheckoutPage = () => {
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span className="font-medium text-green-600">Free</span>
+                <span className="font-medium text-gray-900">{cartShipping === 0 ? <span className="text-green-600">Free</span> : `$${cartShipping.toFixed(2)}`}</span>
               </div>
             </div>
             
             <div className="border-t border-gray-200 pt-4 mb-6 flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-black text-gray-900">${(cartTotal - (couponApplied?.discountAmount || 0)).toFixed(2)}</span>
+              <span className="text-2xl font-black text-gray-900">${(cartTotal + cartShipping - (couponApplied?.discountAmount || 0)).toFixed(2)}</span>
             </div>
             
             <Button 
