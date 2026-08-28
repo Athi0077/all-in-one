@@ -4,7 +4,8 @@ import {
   getFeaturedProducts,
   getProductById,
   getProductsByCategory,
-  createProductReview
+  createProductReview,
+  getProductReviews
 } from '../controllers/productController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -14,6 +15,6 @@ router.route('/').get(getProducts);
 router.route('/featured').get(getFeaturedProducts);
 router.route('/category/:slug').get(getProductsByCategory);
 router.route('/:id').get(getProductById);
-router.route('/:id/reviews').post(protect, createProductReview);
+router.route('/:id/reviews').get(getProductReviews).post(protect, createProductReview);
 
 export default router;

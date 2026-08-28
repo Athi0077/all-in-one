@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getProductById, createProductReview } from '../services/productService';
+import { getProductById, createProductReview, getProductReviews } from '../services/productService';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -14,6 +14,7 @@ const ProductDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -30,9 +31,13 @@ const ProductDetailsPage = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const data = await getProductById(id);
-        setProduct(data);
-        document.title = `${data.name} | All-in-One Store`;
+        const [productData, reviewsData] = await Promise.all([
+          getProductById(id),
+          getProductReviews(id)
+        ]);
+        setProduct(productData);
+        setReviews(reviewsData);
+        document.title = `${productData.name} | All-in-One Store`;
       } catch (error) {
         toast.error('Product not found');
         navigate('/products');
@@ -62,8 +67,12 @@ const ProductDetailsPage = () => {
       setRating(5);
       setComment('');
       // Refresh product to get updated stats
-      const data = await getProductById(id);
-      setProduct(data);
+      const [productData, reviewsData] = await Promise.all([
+        getProductById(id),
+        getProductReviews(id)
+      ]);
+      setProduct(productData);
+      setReviews(reviewsData);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to submit review');
     }
@@ -308,10 +317,25 @@ const ProductDetailsPage = () => {
            <div className="w-full md:w-2/3">
              <h3 className="text-xl font-bold text-gray-900 mb-6">Recent Reviews</h3>
              <div className="space-y-6">
-                {product.numReviews === 0 ? (
+                {reviews.length === 0 ? (
                   <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
                 ) : (
-                  <p className="text-gray-500 italic">Reviews feed implementation coming soon...</p>
+                  reviews.map((review) => (
+                    <div key={review._id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{review.name}</h4>
+                          <p className="text-xs text-gray-400 mt-1">{new Date(review.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={16} className={i < review.rating ? 'fill-current' : 'text-gray-200 fill-current'} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-gray-600 leading-relaxed text-sm">{review.comment}</p>
+                    </div>
+                  ))
                 )}
              </div>
            </div>

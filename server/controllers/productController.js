@@ -167,3 +167,15 @@ export const createProductReview = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Fetch product reviews
+// @route   GET /api/products/:id/reviews
+// @access  Public
+export const getProductReviews = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ product: req.params.id, status: 'Approved' }).sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};

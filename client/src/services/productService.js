@@ -31,3 +31,8 @@ export const createProductReview = async (id, review) => {
   const response = await api.post(`/products/${id}/reviews`, review);
   return response.data;
 };
+
+export const getProductReviews = async (id) => {
+  const response = await api.get(`/products/${id}/reviews`);
+  return response.data;
+};
