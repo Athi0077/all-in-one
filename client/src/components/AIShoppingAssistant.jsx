@@ -21,7 +21,7 @@ const AIShoppingAssistant = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  
+
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
 
@@ -34,9 +34,9 @@ const AIShoppingAssistant = () => {
     setIsOpen(!isOpen);
     if (!isOpen && messages.length === 0) {
       setMessages([
-        { 
-          role: 'assistant', 
-          content: 'Hi there! 👋 I am ShopAI, your personal shopping assistant. How can I help you find the perfect item today?' 
+        {
+          role: 'assistant',
+          content: 'Hi there! 👋 I am ShopAI, your personal shopping assistant. How can I help you find the perfect item today?'
         }
       ]);
     }
@@ -53,15 +53,15 @@ const AIShoppingAssistant = () => {
 
     try {
       const historyToSent = updatedMessages.map(m => ({ role: m.role, content: m.content }));
-      
+
       const response = await api.post('/ai/chat', { messages: historyToSent });
       const { reply, products, actionIntent, conversation } = response.data;
 
       setMessages(prev => [
         ...prev,
-        { 
-          role: 'assistant', 
-          content: reply, 
+        {
+          role: 'assistant',
+          content: reply,
           products: products || [],
           actionIntent
         }
@@ -83,18 +83,18 @@ const AIShoppingAssistant = () => {
   };
 
   const clearChat = () => {
-    setMessages([{ 
-      role: 'assistant', 
-      content: 'Chat cleared. How can I help you today?' 
+    setMessages([{
+      role: 'assistant',
+      content: 'Chat cleared. How can I help you today?'
     }]);
   };
 
   const handleAddToCart = (product) => {
-     addToCart(product, 1);
-     setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: `✅ Added ${product.name} to your cart!` }
-     ]);
+    addToCart(product, 1);
+    setMessages(prev => [
+      ...prev,
+      { role: 'assistant', content: `✅ Added ${product.name} to your cart!` }
+    ]);
   };
 
   return (
@@ -110,7 +110,7 @@ const AIShoppingAssistant = () => {
       </button>
 
       {/* Chat Window */}
-      <div 
+      <div
         className={`fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-8rem)] bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col z-50 transition-all duration-300 transform origin-bottom-right overflow-hidden
           ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-0 opacity-0 translate-y-8 pointer-events-none'}
         `}
@@ -136,7 +136,7 @@ const AIShoppingAssistant = () => {
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`flex max-w-[85%] space-x-2 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                
+
                 {/* Avatar */}
                 <div className="flex-shrink-0 mt-1">
                   {msg.role === 'user' ? (
@@ -153,9 +153,9 @@ const AIShoppingAssistant = () => {
                 {/* Message Bubble */}
                 <div className={`flex flex-col space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div className={`px-4 py-3 rounded-2xl shadow-sm text-sm
-                    ${msg.role === 'user' 
-                      ? 'bg-primary text-white rounded-tr-sm' 
-                      : msg.isError 
+                    ${msg.role === 'user'
+                      ? 'bg-primary text-white rounded-tr-sm'
+                      : msg.isError
                         ? 'bg-red-50 text-red-600 border border-red-100 rounded-tl-sm'
                         : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
                     }
@@ -176,18 +176,18 @@ const AIShoppingAssistant = () => {
                               <span className="text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">⭐ {product.rating}</span>
                             </div>
                             <div className="mt-auto flex space-x-2">
-                               <button 
-                                 onClick={() => navigate(`/products/${product._id}`)}
-                                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 rounded-lg transition-colors font-medium text-center"
-                               >
-                                 View
-                               </button>
-                               <button 
-                                 onClick={() => handleAddToCart(product)}
-                                 className="flex-1 bg-primary hover:bg-primary-dark text-white text-xs py-1.5 rounded-lg transition-colors font-medium flex items-center justify-center"
-                               >
-                                 <Plus size={14} />
-                               </button>
+                              <button
+                                onClick={() => navigate(`/products/${product._id}`)}
+                                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs py-1.5 rounded-lg transition-colors font-medium text-center"
+                              >
+                                View
+                              </button>
+                              <button
+                                onClick={() => handleAddToCart(product)}
+                                className="flex-1 bg-primary hover:bg-primary-dark text-white text-xs py-1.5 rounded-lg transition-colors font-medium flex items-center justify-center"
+                              >
+                                <Plus size={14} />
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -220,7 +220,7 @@ const AIShoppingAssistant = () => {
         {messages.length <= 1 && (
           <div className="px-4 pb-2 pt-2 bg-white flex flex-wrap gap-2 border-t border-gray-50">
             {QUICK_ACTIONS.map((action, i) => (
-              <button 
+              <button
                 key={i}
                 onClick={() => handleSendMessage(action.query)}
                 className="text-[11px] font-medium bg-gray-50 hover:bg-primary/10 hover:text-primary text-gray-600 px-3 py-1.5 rounded-full border border-gray-200 transition-colors"
@@ -233,7 +233,7 @@ const AIShoppingAssistant = () => {
 
         {/* Input Area */}
         <div className="p-4 bg-white border-t border-gray-100">
-          <form 
+          <form
             onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
             className="flex items-center space-x-2 relative"
           >
@@ -250,13 +250,13 @@ const AIShoppingAssistant = () => {
                 }
               }}
               placeholder="Ask anything..."
-              className="flex-1 bg-gray-50 border border-gray-200 rounded-full pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-800 placeholder-gray-400"
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-800 placeholder-gray-400"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || isLoading}
-              className="absolute left-1.5 top-1.5 bottom-1.5 w-10 h-10 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition-colors"
+              className="absolute right-1.5 top-1.5 bottom-1.5 w-10 h-10 bg-primary hover:bg-primary-dark disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition-colors"
             >
               <Send size={16} className="ml-1" />
             </button>
