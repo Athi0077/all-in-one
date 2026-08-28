@@ -80,18 +80,18 @@ const ProductCard = ({ product }) => {
           <span className="text-xs text-text-muted">({product.numReviews})</span>
         </div>
 
-        <div className="mt-auto flex items-end justify-between">
-          <div>
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-baseline gap-1.5">
             <span className="text-lg font-bold text-text">${currentPrice.toFixed(2)}</span>
             {product.discountPrice > 0 && (
-              <span className="ml-2 text-sm text-text-muted line-through">${product.price.toFixed(2)}</span>
+              <span className="text-xs sm:text-sm text-text-muted line-through">${product.price.toFixed(2)}</span>
             )}
           </div>
           
           <button 
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className={`p-2 rounded-lg transition-colors ${product.stock > 0 ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+            className={`p-2 rounded-lg flex-shrink-0 transition-colors ${product.stock > 0 ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
           >
             <ShoppingCart size={20} />
           </button>
