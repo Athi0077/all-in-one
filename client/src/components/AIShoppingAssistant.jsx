@@ -241,6 +241,14 @@ const AIShoppingAssistant = () => {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (inputValue.trim() && !isLoading) {
+                    handleSendMessage();
+                  }
+                }
+              }}
               placeholder="Ask anything..."
               className="flex-1 bg-gray-50 border border-gray-200 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-gray-800 placeholder-gray-400"
               disabled={isLoading}
