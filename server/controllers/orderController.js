@@ -150,7 +150,7 @@ export const addOrderItems = async (req, res, next) => {
         
         sendEmail({
           to: req.user.email,
-          subject: \`Order Confirmation #\${createdOrder._id.toString().substring(0, 8)}\`,
+          subject: `Order Confirmation #${createdOrder._id.toString().substring(0, 8)}`,
           html
         }).catch(err => console.error("Email send failed:", err));
       }
@@ -313,7 +313,7 @@ export const verifyOrderPayment = async (req, res, next) => {
       
       sendEmail({
         to: req.user.email,
-        subject: \`Order Confirmation #\${updatedOrder._id.toString().substring(0, 8)}\`,
+        subject: `Order Confirmation #${updatedOrder._id.toString().substring(0, 8)}`,
         html
       }).catch(err => console.error("Email send failed:", err));
 
