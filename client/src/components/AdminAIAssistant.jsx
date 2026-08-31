@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, User, Loader2, Sparkles, Mic, Square, ShieldAlert, Check, XCircle } from 'lucide-react';
+import { X, Send, Bot, User, Loader2, Sparkles, Mic, Square, ShieldAlert, Check, XCircle, ToggleLeft, ToggleRight } from 'lucide-react';
 import api from '../services/api';
 import { useVoiceInput } from '../hooks/useVoiceInput';
 import { useVoiceOutput } from '../hooks/useVoiceOutput';
@@ -18,9 +18,10 @@ const AdminAIAssistant = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [pendingAction, setPendingAction] = useState(null); // stores actionIntent
   const [isVoiceModeOn, setIsVoiceModeOn] = useState(false);
+  const [isWakeWordEnabled, setIsWakeWordEnabled] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const { isListening, transcript, startListening, stopListening, setTranscript } = useVoiceInput();
+  const { isListening, transcript, permissionError, startListening, stopListening, setTranscript } = useVoiceInput();
   const { isSpeaking, speak, stopSpeaking } = useVoiceOutput();
 
   useEffect(() => {
@@ -28,25 +29,54 @@ const AdminAIAssistant = () => {
   }, [messages, isLoading, pendingAction]);
 
   useEffect(() => {
-    if (transcript && isListening) {
-       setInputValue(transcript);
-    } else if (transcript && !isListening) {
-       if (transcript.trim()) {
-           handleSendMessage(transcript);
-       }
-       setTranscript('');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transcript, isListening]);
+    if (!transcript) return;
+    const lower = transcript.toLowerCase().trim();
 
-  // Conversational loop: restart listening after AI finishes speaking if voice mode is still ON
-  const wasSpeakingRef = useRef(isSpeaking);
-  useEffect(() => {
-    if (wasSpeakingRef.current && !isSpeaking && isVoiceModeOn && !isLoading) {
+    // 1. Stop Command
+    const stopWords = ['stop', 'stop onecart', 'onecart stop', 'stop speaking', 'be quiet'];
+    if (stopWords.some(w => lower === w || lower.startsWith(w + ' '))) {
+      stopSpeaking();
+      setTranscript('');
+      return;
+    }
+
+    // 2. Wake Word Detection (if voice mode is OFF but wake word is enabled)
+    if (!isVoiceModeOn && isWakeWordEnabled) {
+      const wakePattern = /^(hey\s*one\s*cart|hi\s*one\s*cart|one\s*cart|hey\s*onecart)\b/i;
+      const match = transcript.match(wakePattern);
+      if (match) {
+        setIsVoiceModeOn(true);
+        const command = transcript.replace(wakePattern, '').trim().replace(/^,\s*/, '');
+        
+        if (command) {
+          handleSendMessage(command, null, true);
+        } else {
+          speak("Yes, how can I help?");
+        }
+        setTranscript('');
+        return;
+      }
+    }
+
+    // 3. Voice Mode Active Command Processing
+    if (isVoiceModeOn) {
+      handleSendMessage(transcript, null, true);
+      setTranscript('');
+    }
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript, isVoiceModeOn, isWakeWordEnabled, speak, stopSpeaking]);
+
+  const toggleWakeWord = () => {
+    if (isWakeWordEnabled) {
+      setIsWakeWordEnabled(false);
+      setIsVoiceModeOn(false);
+      stopListening();
+    } else {
+      setIsWakeWordEnabled(true);
       startListening();
     }
-    wasSpeakingRef.current = isSpeaking;
-  }, [isSpeaking, isVoiceModeOn, isLoading, startListening]);
+  };
 
   const toggleAssistant = () => {
     setIsOpen(!isOpen);
@@ -60,7 +90,7 @@ const AdminAIAssistant = () => {
     }
   };
 
-  const handleSendMessage = async (query = inputValue, confirmedAction = null) => {
+  const handleSendMessage = async (query = inputValue, confirmedAction = null, isVoice = false) => {
     if (!query.trim() && !confirmedAction) return;
 
     if (pendingAction && query && !confirmedAction) {
@@ -75,7 +105,7 @@ const AdminAIAssistant = () => {
       if (isConfirm) {
         setMessages(prev => [...prev, { role: 'user', content: query }]);
         setInputValue('');
-        handleSendMessage('', pendingAction);
+        handleSendMessage('', pendingAction, isVoice);
         return;
       }
       
@@ -119,7 +149,7 @@ const AdminAIAssistant = () => {
         }
       ]);
 
-      if (reply && isVoiceModeOn) {
+      if (reply && isVoiceModeOn && isVoice) {
         speak(reply);
       }
 
@@ -204,6 +234,10 @@ const AdminAIAssistant = () => {
                  <Square size={14} />
                </button>
             )}
+            <button onClick={toggleWakeWord} className="text-xs flex items-center space-x-1 bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors" title="Toggle 'Hey OneCart' Wake Word">
+              {isWakeWordEnabled ? <ToggleRight size={14} className="text-green-300" /> : <ToggleLeft size={14} className="text-slate-300" />}
+              <span>Wake Word</span>
+            </button>
             <button onClick={clearChat} className="text-xs text-indigo-200 hover:text-white transition-colors bg-white/10 px-2 py-1 rounded">
               Clear
             </button>
@@ -335,12 +369,21 @@ const AdminAIAssistant = () => {
             </button>
           </form>
           <div className="text-center mt-2 flex justify-between px-2 items-center">
-            <span className="text-[10px] text-slate-400 font-mono">AUTHORIZED PERSONNEL ONLY</span>
+            <span className="text-[10px] text-slate-400 font-mono flex flex-col items-start">
+               <span>AUTHORIZED PERSONNEL ONLY</span>
+               {permissionError && <span className="text-red-400">Microphone permission denied</span>}
+            </span>
             <span className="flex items-center text-[10px] text-slate-400 font-medium">
-               {isVoiceModeOn ? (
-                 isListening ? <span className="text-red-500 flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1 animate-pulse"></span>Listening...</span> : <span className="text-amber-500">Voice Mode On</span>
+               {isSpeaking ? (
+                  <span className="text-blue-500 flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1 animate-pulse"></span>Speaking...</span>
+               ) : isLoading ? (
+                  <span className="text-yellow-500 flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-1 animate-pulse"></span>Thinking...</span>
+               ) : isVoiceModeOn ? (
+                  <span className="text-red-500 flex items-center"><span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1 animate-pulse"></span>Listening...</span>
+               ) : isWakeWordEnabled ? (
+                  <span className="text-purple-500">Say "Hey OneCart"</span>
                ) : (
-                 <span className="text-slate-400">Voice Mode Off</span>
+                  <span className="text-slate-400">Voice Mode Off</span>
                )}
             </span>
           </div>
