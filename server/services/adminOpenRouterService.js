@@ -21,9 +21,14 @@ You are allowed to read admin data only when the authenticated user has administ
 For write operations such as changing product data, changing stock, changing price, or changing order status:
 1. You MUST use the 'proposeUpdateProduct' or 'proposeUpdateOrderStatus' tools.
 2. Identify the exact target.
+   - If the user refers to an item by position (e.g., 'the 3rd order', 'the second product'), find the MOST RECENT list tool response and resolve that position to the actual database '_id' or 'orderId'.
+   - Never use a positional number (like '3') as an orderId or productId.
+   - If the user explicitly provides an order ID like '103', use that exact number.
+   - If the reference is ambiguous or missing from the recent context, ask the user to clarify.
 3. Show the current value.
 4. Show the requested new value.
 5. Ask for explicit confirmation.
+6. The system will handle the execution after user confirmation.
 6. The system will handle the execution after user confirmation.
 
 Never delete data unless a dedicated tool explicitly allows it.
@@ -242,7 +247,14 @@ export const processAdminAIChat = async (messages, confirmedAction = null, admin
           }
         } else if (functionName === 'proposeUpdateOrderStatus') {
           try {
-            const order = await Order.findById(functionArgs.orderId);
+            let dbQuery = {};
+            if (mongoose.Types.ObjectId.isValid(functionArgs.orderId)) {
+              dbQuery = { $or: [{ _id: functionArgs.orderId }, { orderId: Number(functionArgs.orderId) || -1 }] };
+            } else {
+              dbQuery = { orderId: Number(functionArgs.orderId) };
+            }
+
+            const order = await Order.findOne(dbQuery).populate('user', 'name');
             if (!order) {
               toolResult = { error: 'Order not found.' };
             } else {
@@ -250,10 +262,10 @@ export const processAdminAIChat = async (messages, confirmedAction = null, admin
                 type: 'CONFIRM_UPDATE',
                 tool: 'updateOrderStatusTool',
                 args: {
-                  orderId: functionArgs.orderId,
+                  orderId: order._id.toString(), // Always use actual MongoDB ID for backend tool
                   status: functionArgs.newStatus
                 },
-                message: `You are about to change the status of order ${order._id} from ${order.orderStatus} to ${functionArgs.newStatus}.`
+                message: `Order #${order.orderId || order._id.toString().substring(0,8)} (Customer: ${order.user ? order.user.name : 'Guest'}, Total: $${order.total.toFixed(2)}). You are about to change its status from ${order.orderStatus} to ${functionArgs.newStatus}.`
               };
               toolResult = {
                 success: true,

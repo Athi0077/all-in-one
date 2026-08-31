@@ -93,7 +93,7 @@ const OrdersPage = () => {
                   </div>
                   <div className="sm:col-span-2">
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Order #</p>
-                    <p className="text-sm font-medium text-gray-900">{order._id}</p>
+                    <p className="text-sm font-medium text-gray-900">{order.orderId || order._id.substring(0,8)}</p>
                   </div>
                 </div>
                 <div>

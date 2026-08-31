@@ -89,7 +89,7 @@ const OrderDetailsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">Order Details</h1>
-          <p className="text-gray-500 mt-1">Order #{order._id}</p>
+          <p className="text-gray-500 mt-1">Order #{order.orderId || order._id}</p>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
           {getStatusIcon(order.orderStatus)}

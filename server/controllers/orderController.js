@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
 import Coupon from '../models/couponModel.js';
+import Counter from '../models/counterModel.js';
 import { validateAndCalculateStock, decrementStock, restoreStock } from '../services/inventoryService.js';
 import { createPayment, verifyPayment } from '../services/paymentService.js';
 import { sendEmail } from '../services/emailService.js';
@@ -59,9 +60,25 @@ export const addOrderItems = async (req, res, next) => {
       const shippingCharge = validatedItems.reduce((acc, item) => acc + (item.shippingCharge || 0) * item.qty, 0);
       const total = subtotal - discount + shippingCharge;
 
-      // 4. Create Order
+      // 4. Generate Order ID
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: 'orderId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true, session }
+      );
+      
+      // Initialize to 100 if it was just created (starts at 1 in some MongoDB versions with upsert)
+      let currentOrderId = counter.seq;
+      if (currentOrderId < 100) {
+        currentOrderId = 100;
+        counter.seq = 100;
+        await counter.save({ session });
+      }
+
+      // 5. Create Order
       const order = new Order({
         user: req.user._id,
+        orderId: currentOrderId,
         items: validatedItems,
         shippingAddress,
         paymentMethod,
@@ -74,10 +91,10 @@ export const addOrderItems = async (req, res, next) => {
 
       const createdOrder = await order.save({ session });
 
-      // 5. Update Inventory
+      // 6. Update Inventory
       await decrementStock(validatedItems, session);
 
-      // 6. Handle Payment logic
+      // 7. Handle Payment logic
       if (paymentMethod === 'Online Payment') {
         const paymentResult = await createPayment(total, 'INR');
         createdOrder.paymentResult = { id: paymentResult.id, status: 'Initiated' };
@@ -115,7 +132,7 @@ export const addOrderItems = async (req, res, next) => {
             </div>
             <div style="padding: 20px; background-color: #f9fafb; border: 1px solid #eee; border-top: none;">
               <p>Hi ${req.user.name},</p>
-              <p>Thank you for shopping with AllinOne Store! Your Cash on Delivery order <strong>#${createdOrder._id.toString().substring(0, 8)}</strong> has been confirmed.</p>
+              <p>Thank you for shopping with AllinOne Store! Your Cash on Delivery order <strong>#${createdOrder.orderId}</strong> has been confirmed.</p>
               
               <h3 style="margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Details</h3>
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -150,7 +167,7 @@ export const addOrderItems = async (req, res, next) => {
         
         sendEmail({
           to: req.user.email,
-          subject: `Order Confirmation #${createdOrder._id.toString().substring(0, 8)}`,
+          subject: `Order Confirmation #${createdOrder.orderId}`,
           html
         }).catch(err => console.error("Email send failed:", err));
       }
@@ -278,7 +295,7 @@ export const verifyOrderPayment = async (req, res, next) => {
           </div>
           <div style="padding: 20px; background-color: #f9fafb; border: 1px solid #eee; border-top: none;">
             <p>Hi ${req.user.name},</p>
-            <p>We have successfully received your payment! Your order <strong>#${updatedOrder._id.toString().substring(0, 8)}</strong> has been confirmed.</p>
+            <p>We have successfully received your payment! Your order <strong>#${updatedOrder.orderId}</strong> has been confirmed.</p>
             
             <h3 style="margin-top: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Details</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
@@ -313,7 +330,7 @@ export const verifyOrderPayment = async (req, res, next) => {
       
       sendEmail({
         to: req.user.email,
-        subject: `Order Confirmation #${updatedOrder._id.toString().substring(0, 8)}`,
+        subject: `Order Confirmation #${updatedOrder.orderId}`,
         html
       }).catch(err => console.error("Email send failed:", err));
 

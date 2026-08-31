@@ -107,7 +107,7 @@ const UserDetails = () => {
                   <div key={order._id} className="p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:bg-gray-50 transition-colors">
                     <div>
                       <Link to={`/admin/orders/${order._id}`} className="font-bold text-gray-900 hover:text-primary transition-colors">
-                        #{order._id.substring(0, 8)}
+                        #{order.orderId || order._id.substring(0, 8)}
                       </Link>
                       <p className="text-sm text-gray-500 mt-1">{new Date(order.createdAt).toLocaleDateString()}</p>
                     </div>

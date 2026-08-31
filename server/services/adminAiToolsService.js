@@ -11,7 +11,7 @@ export const getInventory = async () => {
     return {
       totalProducts: products.length,
       totalStock: products.reduce((acc, curr) => acc + curr.stock, 0),
-      items: products.slice(0, 50) // limit for AI context
+      items: products.slice(0, 50).map((p, index) => ({ position: index + 1, ...p })) // limit for AI context
     };
   } catch (error) {
     console.error('Error in getInventory:', error);
@@ -22,7 +22,7 @@ export const getInventory = async () => {
 export const getLowStockProducts = async ({ threshold = 5 }) => {
   try {
     const products = await Product.find({ stock: { $lte: threshold } }).select('name stock price').lean();
-    return products;
+    return products.map((p, index) => ({ position: index + 1, ...p }));
   } catch (error) {
     console.error('Error in getLowStockProducts:', error);
     return { error: 'Failed to fetch low stock products.' };
@@ -49,7 +49,7 @@ export const searchAdminProducts = async ({ query = '', category = '' }) => {
     }
 
     const products = await Product.find(dbQuery).select('name stock price rating isActive discountPrice').limit(10).lean();
-    return products;
+    return products.map((p, index) => ({ position: index + 1, ...p }));
   } catch (error) {
     console.error('Error in searchAdminProducts:', error);
     return { error: 'Failed to search products.' };
@@ -63,8 +63,10 @@ export const getAdminOrders = async ({ status = '', limit = 10 }) => {
       query.orderStatus = status;
     }
     const orders = await Order.find(query).sort({ createdAt: -1 }).limit(limit).populate('user', 'name').lean();
-    return orders.map(order => ({
+    return orders.map((order, index) => ({
+      position: index + 1,
       _id: order._id,
+      orderId: order.orderId,
       user: order.user ? order.user.name : 'Unknown',
       total: order.total,
       status: order.orderStatus,
@@ -82,6 +84,7 @@ export const getAdminOrderById = async ({ orderId }) => {
     if (!order) return { error: 'Order not found.' };
     return {
       _id: order._id,
+      orderId: order.orderId,
       user: order.user,
       total: order.total,
       status: order.orderStatus,
@@ -158,7 +161,14 @@ export const updateOrderStatusTool = async ({ orderId, status, adminId }) => {
     const validStatuses = ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled'];
     if (!validStatuses.includes(status)) return { error: 'Invalid order status.' };
 
-    const order = await Order.findById(orderId);
+    let dbQuery = {};
+    if (mongoose.Types.ObjectId.isValid(orderId)) {
+      dbQuery = { $or: [{ _id: orderId }, { orderId: Number(orderId) || -1 }] };
+    } else {
+      dbQuery = { orderId: Number(orderId) };
+    }
+
+    const order = await Order.findOne(dbQuery);
     if (!order) return { error: 'Order not found.' };
 
     const oldStatus = order.orderStatus;

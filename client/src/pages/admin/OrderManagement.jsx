@@ -90,7 +90,7 @@ const OrderManagement = () => {
               ) : (
                 orders.map(order => (
                   <tr key={order._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">#{order._id.substring(0, 8)}</td>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">#{order.orderId || order._id.substring(0, 8)}</td>
                     <td className="py-4 px-6">
                       <p className="text-sm font-bold text-gray-900">{order.user?.name || 'Guest'}</p>
                       <p className="text-xs text-gray-500">{order.user?.email || ''}</p>

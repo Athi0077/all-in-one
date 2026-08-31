@@ -63,7 +63,7 @@ const OrderDetails = () => {
           <ArrowLeft size={20} />
         </Link>
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Order #{order._id.substring(0, 8)}</h1>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Order #{order.orderId || order._id.substring(0, 8)}</h1>
           <p className="text-gray-500 mt-1">Placed on {new Date(order.createdAt).toLocaleString()}</p>
         </div>
       </div>

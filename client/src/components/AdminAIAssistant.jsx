@@ -63,6 +63,31 @@ const AdminAIAssistant = () => {
   const handleSendMessage = async (query = inputValue, confirmedAction = null) => {
     if (!query.trim() && !confirmedAction) return;
 
+    if (pendingAction && query && !confirmedAction) {
+      const lowerQuery = query.toLowerCase().trim();
+      // Match exact words or starting words to avoid false positives
+      const confirmWords = ['yes', 'confirm', 'approve', 'yep', 'yeah', 'sure', 'ok', 'okay', 'do it'];
+      const cancelWords = ['no', 'cancel', 'stop', 'reject', 'nope', 'nah'];
+      
+      const isConfirm = confirmWords.some(w => lowerQuery === w || lowerQuery.startsWith(w + ' '));
+      const isCancel = cancelWords.some(w => lowerQuery === w || lowerQuery.startsWith(w + ' '));
+
+      if (isConfirm) {
+        setMessages(prev => [...prev, { role: 'user', content: query }]);
+        setInputValue('');
+        handleSendMessage('', pendingAction);
+        return;
+      }
+      
+      if (isCancel) {
+        setMessages(prev => [...prev, { role: 'user', content: query }, { role: 'assistant', content: 'Action cancelled.', isSystemStatus: true }]);
+        setInputValue('');
+        setPendingAction(null);
+        if (isVoiceModeOn && isSpeaking) stopSpeaking();
+        return;
+      }
+    }
+
     const userMsg = { role: 'user', content: query };
     const updatedMessages = query ? [...messages, userMsg] : messages;
     

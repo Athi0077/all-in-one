@@ -202,7 +202,7 @@ const Dashboard = () => {
               <tbody className="divide-y divide-gray-100">
                 {stats.recentOrders.map(order => (
                   <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">#{order._id.substring(0, 8)}</td>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">#{order.orderId || order._id.substring(0, 8)}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">{order.user?.name || 'Guest'}</td>
                     <td className="py-4 px-6 text-sm text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
                     <td className="py-4 px-6 text-sm font-bold text-gray-900">${order.total.toFixed(2)}</td>
