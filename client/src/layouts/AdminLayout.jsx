@@ -16,6 +16,7 @@ import {
   Search,
   Bell
 } from 'lucide-react';
+import AdminAIAssistant from '../components/AdminAIAssistant';
 
 const AdminLayout = () => {
   const { user, logout } = useContext(AuthContext);
@@ -184,6 +185,8 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
+
+      <AdminAIAssistant />
     </div>
   );
 };

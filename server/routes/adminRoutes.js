@@ -23,6 +23,7 @@ import {
   getSettings,
   updateSettings
 } from '../controllers/adminController.js';
+import { handleAdminAIChat } from '../controllers/adminAiController.js';
 
 const router = express.Router();
 
@@ -31,6 +32,9 @@ router.use(protect, adminOnly);
 
 // Dashboard
 router.get('/dashboard', getDashboardStats);
+
+// AI Chat
+router.post('/ai/chat', handleAdminAIChat);
 
 // Products
 router.route('/products')
