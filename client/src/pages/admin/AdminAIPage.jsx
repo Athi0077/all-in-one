@@ -194,17 +194,17 @@ const AdminAIPage = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] bg-white rounded-3xl shadow-lg border border-indigo-100 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 p-6 flex justify-between items-center text-white shrink-0">
+      <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-white shrink-0">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm shadow-inner">
+          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm shadow-inner shrink-0">
             <Sparkles size={24} className="text-indigo-300" />
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-wide">Admin AI Copilot</h2>
-            <p className="text-sm text-indigo-200 font-medium">Your intelligent store management assistant</p>
+            <h2 className="text-lg sm:text-xl font-bold tracking-wide">Admin AI Copilot</h2>
+            <p className="text-xs sm:text-sm text-indigo-200 font-medium">Your intelligent store management assistant</p>
           </div>
         </div>
-        <div className="flex items-center space-x-3 bg-indigo-950/40 p-2 rounded-xl border border-indigo-700/50">
+        <div className="flex flex-wrap items-center gap-2 bg-indigo-950/40 p-2 rounded-xl border border-indigo-700/50 w-full sm:w-auto">
           {isSpeaking && (
              <button onClick={stopSpeaking} className="flex items-center space-x-2 text-sm bg-red-500/20 text-red-200 hover:bg-red-500/40 px-3 py-1.5 rounded-lg transition-colors" title="Stop AI Voice">
                <Square size={16} /> <span>Stop Voice</span>
@@ -225,7 +225,7 @@ const AdminAIPage = () => {
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`flex max-w-[75%] space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+            <div className={`flex max-w-[90%] md:max-w-[75%] space-x-2 sm:space-x-3 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse sm:space-x-reverse' : ''}`}>
               <div className="flex-shrink-0 mt-1">
                 {msg.role === 'user' ? (
                   <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-md">
@@ -259,7 +259,7 @@ const AdminAIPage = () => {
         {/* Pending Action Confirmation */}
         {pendingAction && !isLoading && (
            <div className="flex justify-start">
-            <div className="flex max-w-[75%] space-x-3">
+            <div className="flex max-w-[95%] md:max-w-[75%] space-x-2 sm:space-x-3">
                <div className="flex-shrink-0 mt-1 w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center text-white shadow-md">
                   <ShieldAlert size={18} />
                </div>
@@ -345,12 +345,12 @@ const AdminAIPage = () => {
             <Send size={20} className="ml-1" />
           </button>
         </form>
-        <div className="max-w-4xl mx-auto text-center mt-3 flex justify-between px-2 items-center">
-          <span className="text-xs text-slate-400 font-mono tracking-wider flex items-center">
+        <div className="max-w-4xl mx-auto text-center mt-3 flex flex-col sm:flex-row justify-between px-2 items-center gap-2">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-mono tracking-wider flex items-center flex-wrap justify-center">
              <ShieldAlert size={12} className="mr-1" /> AUTHORIZED PERSONNEL ONLY
              {permissionError && <span className="text-red-400 ml-2 border-l border-slate-300 pl-2">Microphone permission denied</span>}
           </span>
-          <span className="flex items-center text-xs font-semibold tracking-wide">
+          <span className="flex items-center text-[10px] sm:text-xs font-semibold tracking-wide">
              {isSpeaking ? (
                 <span className="text-blue-500 flex items-center bg-blue-50 px-2 py-1 rounded-md"><span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2 animate-pulse"></span>SPEAKING</span>
              ) : isLoading ? (
