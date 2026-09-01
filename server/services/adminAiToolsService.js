@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
 import AuditLog from '../models/auditLogModel.js';
@@ -80,8 +81,16 @@ export const getAdminOrders = async ({ status = '', limit = 10 }) => {
 
 export const getAdminOrderById = async ({ orderId }) => {
   try {
-    const order = await Order.findById(orderId).populate('user', 'name email').lean();
-    if (!order) return { error: 'Order not found.' };
+    const numericOrderId = Number(orderId);
+    let order;
+    if (Number.isInteger(numericOrderId)) {
+      order = await Order.findOne({ orderId: numericOrderId }).populate('user', 'name email').lean();
+    }
+    if (!order && mongoose.Types.ObjectId.isValid(orderId)) {
+      order = await Order.findById(orderId).populate('user', 'name email').lean();
+    }
+
+    if (!order) return { error: `Order ${orderId} not found.` };
     return {
       _id: order._id,
       orderId: order.orderId,
@@ -161,19 +170,35 @@ export const updateOrderStatusTool = async ({ orderId, status, adminId }) => {
     const validStatuses = ['Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled'];
     if (!validStatuses.includes(status)) return { error: 'Invalid order status.' };
 
-    let dbQuery = {};
-    if (mongoose.Types.ObjectId.isValid(orderId)) {
-      dbQuery = { $or: [{ _id: orderId }, { orderId: Number(orderId) || -1 }] };
-    } else {
-      dbQuery = { orderId: Number(orderId) };
+    const numericOrderId = Number(orderId);
+    if (!Number.isInteger(numericOrderId)) {
+        return { error: 'Invalid order ID format. Must be an integer.' };
     }
 
-    const order = await Order.findOne(dbQuery);
-    if (!order) return { error: 'Order not found.' };
+    const order = await Order.findOneAndUpdate(
+        { 
+            orderId: numericOrderId,
+            orderStatus: { $ne: status }
+        },
+        { 
+            $set: { orderStatus: status } 
+        },
+        { 
+            new: false
+        }
+    );
+
+    if (!order) {
+        const existingOrder = await Order.findOne({ orderId: numericOrderId });
+        if (!existingOrder) {
+            return { error: `Order ${numericOrderId} not found.` };
+        } else if (existingOrder.orderStatus === status) {
+            return { error: `Order ${numericOrderId} is already ${status}.` };
+        }
+        return { error: 'Failed to update order status.' };
+    }
 
     const oldStatus = order.orderStatus;
-    order.orderStatus = status;
-    await order.save();
 
     await AuditLog.create({
       admin: adminId,
@@ -183,7 +208,14 @@ export const updateOrderStatusTool = async ({ orderId, status, adminId }) => {
       details: `Changed status from ${oldStatus} to ${status}`
     });
 
-    return { success: true, message: `Order status updated to ${status}.` };
+    return { 
+        success: true, 
+        action: "update_order_status",
+        orderId: numericOrderId,
+        previousStatus: oldStatus,
+        newStatus: status,
+        message: `Order ${numericOrderId} has been ${status.toLowerCase()} successfully.` 
+    };
   } catch (error) {
     console.error('Error in updateOrderStatusTool:', error);
     return { error: 'Failed to update order status.' };

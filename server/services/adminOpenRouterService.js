@@ -93,7 +93,7 @@ const tools = [
       parameters: {
         type: "object",
         properties: {
-          orderId: { type: "string" }
+          orderId: { type: "integer", description: "Human-readable order ID" }
         },
         required: ["orderId"]
       }
@@ -131,7 +131,7 @@ const tools = [
       parameters: {
         type: "object",
         properties: {
-          orderId: { type: "string" },
+          orderId: { type: "integer", description: "Human-readable order ID such as 100, 101, 102" },
           newStatus: { type: "string", enum: ["Pending", "Confirmed", "Processing", "Packed", "Shipped", "Delivered", "Cancelled"] }
         },
         required: ["orderId", "newStatus"]
@@ -247,33 +247,34 @@ export const processAdminAIChat = async (messages, confirmedAction = null, admin
           }
         } else if (functionName === 'proposeUpdateOrderStatus') {
           try {
-            let dbQuery = {};
-            if (mongoose.Types.ObjectId.isValid(functionArgs.orderId)) {
-              dbQuery = { $or: [{ _id: functionArgs.orderId }, { orderId: Number(functionArgs.orderId) || -1 }] };
+            const numericOrderId = Number(functionArgs.orderId);
+            if (!Number.isInteger(numericOrderId)) {
+              toolResult = { error: 'Invalid order ID format. Must be an integer.' };
             } else {
-              dbQuery = { orderId: Number(functionArgs.orderId) };
-            }
-
-            const order = await Order.findOne(dbQuery).populate('user', 'name');
-            if (!order) {
-              toolResult = { error: 'Order not found.' };
-            } else {
-              actionIntent = {
-                type: 'CONFIRM_UPDATE',
-                tool: 'updateOrderStatusTool',
-                args: {
-                  orderId: order._id.toString(), // Always use actual MongoDB ID for backend tool
-                  status: functionArgs.newStatus
-                },
-                message: `Order #${order.orderId || order._id.toString().substring(0,8)} (Customer: ${order.user ? order.user.name : 'Guest'}, Total: $${order.total.toFixed(2)}). You are about to change its status from ${order.orderStatus} to ${functionArgs.newStatus}.`
-              };
-              toolResult = {
-                success: true,
-                currentStatus: order.orderStatus,
-                instructionToAI: "Ask the user to confirm this status change explicitly."
-              };
+              const order = await Order.findOne({ orderId: numericOrderId }).populate('user', 'name');
+              if (!order) {
+                toolResult = { error: `Order ${numericOrderId} not found.` };
+              } else if (order.orderStatus === functionArgs.newStatus) {
+                toolResult = { error: `Order ${numericOrderId} is already ${functionArgs.newStatus}.` };
+              } else {
+                actionIntent = {
+                  type: 'CONFIRM_UPDATE',
+                  tool: 'updateOrderStatusTool',
+                  args: {
+                    orderId: numericOrderId, // Always use human-readable order ID
+                    status: functionArgs.newStatus
+                  },
+                  message: `Order #${order.orderId} (Customer: ${order.user ? order.user.name : 'Guest'}, Total: $${order.total.toFixed(2)}). You are about to change its status from ${order.orderStatus} to ${functionArgs.newStatus}.`
+                };
+                toolResult = {
+                  success: true,
+                  currentStatus: order.orderStatus,
+                  instructionToAI: "Ask the user to confirm this status change explicitly."
+                };
+              }
             }
           } catch (e) {
+            console.error('proposeUpdateOrderStatus Error:', e);
             toolResult = { error: 'Invalid order ID' };
           }
         }

@@ -14,7 +14,8 @@ import {
   Menu,
   X,
   Search,
-  Bell
+  Bell,
+  Bot
 } from 'lucide-react';
 import AdminAIAssistant from '../components/AdminAIAssistant';
 
@@ -49,6 +50,7 @@ const AdminLayout = () => {
     { name: 'Users', path: '/admin/users', icon: Users },
     { name: 'Coupons', path: '/admin/coupons', icon: Tag },
     { name: 'Reviews', path: '/admin/reviews', icon: MessageSquare },
+    { name: 'AI Assistant', path: '/admin/ai-assistant', icon: Bot },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
@@ -186,7 +188,7 @@ const AdminLayout = () => {
         </main>
       </div>
 
-      <AdminAIAssistant />
+      {location.pathname !== '/admin/ai-assistant' && <AdminAIAssistant />}
     </div>
   );
 };
