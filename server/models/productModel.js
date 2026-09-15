@@ -59,6 +59,10 @@ const productSchema = mongoose.Schema(
     sku: {
       type: String,
     },
+    productLink: {
+      type: String,
+      default: "",
+    },
     rating: {
       type: Number,
       required: true,

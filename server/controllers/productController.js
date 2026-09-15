@@ -66,6 +66,7 @@ export const getProducts = async (req, res, next) => {
 
     const count = await Product.countDocuments({ ...query });
     const products = await Product.find({ ...query })
+      .select('-productLink')
       .populate('category', 'name slug')
       .sort(sortObj)
       .limit(pageSize)
@@ -88,6 +89,7 @@ export const getProducts = async (req, res, next) => {
 export const getFeaturedProducts = async (req, res, next) => {
   try {
     const products = await Product.find({ isFeatured: true, isActive: true })
+      .select('-productLink')
       .populate('category', 'name slug')
       .limit(8);
     res.json(products);
@@ -101,7 +103,7 @@ export const getFeaturedProducts = async (req, res, next) => {
 // @access  Public
 export const getProductById = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id).populate('category', 'name slug');
+    const product = await Product.findById(req.params.id).select('-productLink').populate('category', 'name slug');
     if (product) {
       res.json(product);
     } else {
@@ -124,7 +126,7 @@ export const getProductsByCategory = async (req, res, next) => {
       throw new Error('Category not found');
     }
 
-    const products = await Product.find({ category: category._id, isActive: true }).populate('category', 'name slug');
+    const products = await Product.find({ category: category._id, isActive: true }).select('-productLink').populate('category', 'name slug');
     res.json({ category, products });
   } catch (error) {
     next(error);
@@ -189,7 +191,7 @@ export const getProductReviews = async (req, res, next) => {
 // @access  Public
 export const getProductAiSummary = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).select('-productLink');
     if (!product) {
       res.status(404);
       throw new Error('Product not found');
@@ -244,7 +246,7 @@ Description: ${product.description}`;
 // @access  Public
 export const getRelatedProducts = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).select('-productLink');
     if (!product) {
       res.status(404);
       throw new Error('Product not found');
@@ -255,6 +257,7 @@ export const getRelatedProducts = async (req, res, next) => {
       category: product.category,
       isActive: true
     })
+      .select('-productLink')
       .populate('category', 'name slug')
       .limit(4);
 

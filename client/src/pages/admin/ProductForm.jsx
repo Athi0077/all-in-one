@@ -27,6 +27,7 @@ const ProductForm = () => {
     sizes: [],
     stock: '',
     sku: '',
+    productLink: '',
     images: [],
     isFeatured: false,
     isActive: true,
@@ -64,6 +65,7 @@ const ProductForm = () => {
             sizes: data.sizes || [],
             stock: data.stock,
             sku: data.sku || '',
+            productLink: data.productLink || '',
             images: data.images || [],
             isFeatured: data.isFeatured,
             isActive: data.isActive,
@@ -243,6 +245,19 @@ const ProductForm = () => {
               />
             </div>
           </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+          <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4">External Reference</h3>
+          <Input
+            label="Product Link (Optional)"
+            name="productLink"
+            type="url"
+            value={formData.productLink}
+            onChange={handleChange}
+            placeholder="Enter the original/source product URL"
+            fullWidth
+          />
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">

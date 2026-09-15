@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminProducts, deleteProduct } from '../../services/adminService';
-import { Plus, Edit, Trash2, Search, Package, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Star, ExternalLink } from 'lucide-react';
 import Button from '../../components/Button';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../../utils/getImageUrl';
@@ -79,6 +79,7 @@ const ProductManagement = () => {
                 <th className="py-4 px-6 font-medium whitespace-nowrap">Price</th>
                 <th className="py-4 px-6 font-medium whitespace-nowrap">Stock</th>
                 <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                <th className="py-4 px-6 font-medium whitespace-nowrap">Product Link</th>
                 <th className="py-4 px-6 font-medium text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
@@ -91,12 +92,13 @@ const ProductManagement = () => {
                     <td className="py-4 px-6"><div className="h-4 bg-gray-200 rounded w-16"></div></td>
                     <td className="py-4 px-6"><div className="h-4 bg-gray-200 rounded w-12"></div></td>
                     <td className="py-4 px-6"><div className="h-6 bg-gray-200 rounded-full w-20"></div></td>
+                    <td className="py-4 px-6"><div className="h-6 bg-gray-200 rounded w-8"></div></td>
                     <td className="py-4 px-6"><div className="h-8 bg-gray-200 rounded w-16 ml-auto"></div></td>
                   </tr>
                 ))
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-12 text-center text-gray-500">
+                  <td colSpan="7" className="py-12 text-center text-gray-500">
                     <Package size={48} className="mx-auto text-gray-300 mb-4" />
                     <p className="text-lg font-medium">No products found</p>
                   </td>
@@ -127,6 +129,21 @@ const ProductManagement = () => {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                         {product.isActive ? 'Active' : 'Draft'}
                       </span>
+                    </td>
+                    <td className="py-4 px-6 text-sm">
+                      {product.productLink ? (
+                        <a 
+                          href={product.productLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                        >
+                          <ExternalLink size={14} />
+                          View Link
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
