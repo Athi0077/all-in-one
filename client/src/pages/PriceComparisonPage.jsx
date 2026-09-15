@@ -26,7 +26,11 @@ const PriceComparisonPage = () => {
     setError(null);
     try {
       const response = await axios.get(`/api/price-comparison?search=${encodeURIComponent(searchQuery)}`);
-      setData(response.data);
+      if (response.data && response.data.results) {
+        setData(response.data);
+      } else {
+        throw new Error('Invalid data format received from server');
+      }
     } catch (err) {
       console.error("Error fetching comparison:", err);
       setError(err.response?.data?.message || 'Failed to fetch price comparison data.');
@@ -109,7 +113,7 @@ const PriceComparisonPage = () => {
           </div>
         )}
 
-        {!loading && !error && data && (
+        {!loading && !error && data && data.results && (
           <div>
             <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
