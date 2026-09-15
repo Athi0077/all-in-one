@@ -214,8 +214,9 @@ const CheckoutPage = () => {
 
         cartItems.forEach(item => {
            const sizeStr = item.size ? ` (Size: ${item.size})` : '';
+           const colorStr = item.color ? ` (Color: ${item.color})` : '';
            const imageStr = typeof item.imageIndex === 'number' ? ` [${getOrdinalSuffix(item.imageIndex + 1)} Image]` : '';
-           message += `- ${item.name}${sizeStr}${imageStr} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
+           message += `- ${item.name}${sizeStr}${colorStr}${imageStr} x ${item.qty} ($${((item.discountPrice || item.price) * item.qty).toFixed(2)})\n`;
         });
         message += `\n*Total:* $${finalTotal}\n\n*Shipping Address:*\n${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.postalCode}, ${shippingAddress.country}`;
         
@@ -386,6 +387,13 @@ const CheckoutPage = () => {
                   <img src={getImageUrl(item.image)} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-gray-900 line-clamp-2">{item.name}</h4>
+                    {(item.size || item.color) && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {item.size && `Size: ${item.size}`}
+                        {item.size && item.color && ' | '}
+                        {item.color && `Color: ${item.color}`}
+                      </p>
+                    )}
                     <div className="flex items-baseline gap-2 mt-1">
                       <p className="text-sm font-medium text-gray-900">{item.qty} x ${(item.discountPrice || item.price).toFixed(2)}</p>
                       {item.discountPrice && (

@@ -51,7 +51,7 @@ const CartPage = () => {
             
             <div className="divide-y divide-gray-100">
               {cartItems.map((item, idx) => (
-                <div key={`${item.product}-${item.size || 'default'}-${idx}`} className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-6 items-center">
+                <div key={`${item.product}-${item.size || 'default'}-${item.color || 'default'}-${idx}`} className="grid grid-cols-1 sm:grid-cols-12 gap-4 p-6 items-center">
                   {/* Product Info */}
                   <div className="col-span-1 sm:col-span-6 flex gap-4 items-center">
                     <img 
@@ -66,6 +66,9 @@ const CartPage = () => {
                       {item.size && (
                         <div className="text-sm text-gray-500 mt-1">Size: {item.size}</div>
                       )}
+                      {item.color && (
+                        <div className="text-sm text-gray-500 mt-1">Color: {item.color}</div>
+                      )}
                       <div className="mt-1 sm:hidden flex flex-wrap items-baseline gap-1.5">
                         <span className="text-gray-900 font-bold">${(item.discountPrice || item.price).toFixed(2)}</span>
                         {item.discountPrice && (
@@ -79,14 +82,14 @@ const CartPage = () => {
                   <div className="col-span-1 sm:col-span-3 flex justify-start sm:justify-center">
                     <div className="flex items-center border border-gray-300 rounded-full">
                       <button 
-                        onClick={() => updateQty(item.product, item.size, Math.max(1, item.qty - 1))}
+                        onClick={() => updateQty(item.product, item.size, item.color, item.imageIndex, Math.max(1, item.qty - 1))}
                         className="p-2 text-gray-500 hover:text-gray-900 transition-colors"
                       >
                         <Minus size={14} />
                       </button>
                       <span className="w-8 text-center font-semibold text-sm">{item.qty}</span>
                       <button 
-                        onClick={() => updateQty(item.product, item.size, Math.min(item.stock, item.qty + 1))}
+                        onClick={() => updateQty(item.product, item.size, item.color, item.imageIndex, Math.min(item.stock, item.qty + 1))}
                         className="p-2 text-gray-500 hover:text-gray-900 transition-colors"
                         disabled={item.qty >= item.stock}
                       >
@@ -106,7 +109,7 @@ const CartPage = () => {
                   {/* Remove */}
                   <div className="col-span-1 sm:col-span-1 text-right">
                     <button 
-                      onClick={() => removeFromCart(item.product, item.size)}
+                      onClick={() => removeFromCart(item.product, item.size, item.color, item.imageIndex)}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <Trash2 size={20} className="inline-block sm:block" />

@@ -159,6 +159,9 @@ const OrderDetailsPage = () => {
                     {item.size && (
                       <p className="text-sm text-gray-500 mb-1">Size: {item.size}</p>
                     )}
+                    {item.color && (
+                      <p className="text-sm text-gray-500 mb-1">Color: {item.color}</p>
+                    )}
                     <p className="text-sm text-gray-500">Qty: {item.qty}</p>
                   </div>
                   <div className="text-right font-bold text-gray-900 whitespace-nowrap flex flex-col items-end gap-2">

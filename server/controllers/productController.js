@@ -41,7 +41,7 @@ export const getProducts = async (req, res, next) => {
     }
 
     if (req.query.color) {
-      query.color = req.query.color;
+      query.colors = req.query.color;
     }
 
     // Sort

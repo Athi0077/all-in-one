@@ -23,7 +23,7 @@ const ProductForm = () => {
     discountPrice: '',
     shippingCharge: '',
     category: '',
-    color: '',
+    colors: [],
     sizes: [],
     stock: '',
     sku: '',
@@ -60,7 +60,7 @@ const ProductForm = () => {
             discountPrice: data.discountPrice || '',
             shippingCharge: data.shippingCharge || '',
             category: data.category?._id || data.category,
-            color: data.color || '',
+            colors: data.colors || [],
             sizes: data.sizes || [],
             stock: data.stock,
             sku: data.sku || '',
@@ -83,6 +83,15 @@ const ProductForm = () => {
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleColorToggle = (color) => {
+    setFormData(prev => ({
+      ...prev,
+      colors: prev.colors.includes(color)
+        ? prev.colors.filter(c => c !== color)
+        : [...prev.colors, color]
     }));
   };
 
@@ -190,28 +199,20 @@ const ProductForm = () => {
               </select>
             </div>
 
-            <div className="w-full">
-              <label className="block text-sm font-medium text-gray-900 mb-1">Color (Optional)</label>
-              <select
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors bg-white"
-              >
-                <option value="">Select a color</option>
-                <option value="Red">Red</option>
-                <option value="Blue">Blue</option>
-                <option value="Green">Green</option>
-                <option value="Yellow">Yellow</option>
-                <option value="Orange">Orange</option>
-                <option value="Purple">Purple</option>
-                <option value="Pink">Pink</option>
-                <option value="Black">Black</option>
-                <option value="White">White</option>
-                <option value="Gray">Gray</option>
-                <option value="Brown">Brown</option>
-                <option value="Cyan">Cyan</option>
-              </select>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">Available Colors (Optional)</label>
+              <div className="flex flex-wrap gap-2">
+                {['Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Pink', 'Black', 'White', 'Gray', 'Brown', 'Cyan'].map(color => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => handleColorToggle(color)}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors border ${formData.colors.includes(color) ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-primary'}`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="md:col-span-2">

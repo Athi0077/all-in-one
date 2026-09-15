@@ -21,6 +21,7 @@ const orderSchema = mongoose.Schema(
         imageIndex: { type: Number, default: 0 },
         price: { type: Number, required: true },
         size: { type: String },
+        color: { type: String },
         product: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,

@@ -12,12 +12,12 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, qty = 1, size = null, imageIndex = 0) => {
+  const addToCart = (product, qty = 1, size = null, color = null, imageIndex = 0) => {
     setCartItems(prevItems => {
-      const existItem = prevItems.find(x => x.product === product._id && x.size === size && x.imageIndex === imageIndex);
+      const existItem = prevItems.find(x => x.product === product._id && x.size === size && x.color === color && x.imageIndex === imageIndex);
       if (existItem) {
         return prevItems.map(x =>
-          (x.product === existItem.product && x.size === existItem.size && x.imageIndex === existItem.imageIndex) ? { ...existItem, qty: existItem.qty + qty } : x
+          (x.product === existItem.product && x.size === existItem.size && x.color === existItem.color && x.imageIndex === existItem.imageIndex) ? { ...existItem, qty: existItem.qty + qty } : x
         );
       } else {
         return [...prevItems, { 
@@ -30,20 +30,21 @@ export const CartProvider = ({ children }) => {
           shippingCharge: product.shippingCharge || 0,
           stock: product.stock,
           size,
+          color,
           qty 
         }];
       }
     });
   };
 
-  const updateQty = (id, size, imageIndex, qty) => {
+  const updateQty = (id, size, color, imageIndex, qty) => {
     setCartItems(prevItems =>
-      prevItems.map(item => (item.product === id && item.size === size && item.imageIndex === imageIndex ? { ...item, qty } : item))
+      prevItems.map(item => (item.product === id && item.size === size && item.color === color && item.imageIndex === imageIndex ? { ...item, qty } : item))
     );
   };
 
-  const removeFromCart = (id, size, imageIndex) => {
-    setCartItems(prevItems => prevItems.filter(item => !(item.product === id && item.size === size && item.imageIndex === imageIndex)));
+  const removeFromCart = (id, size, color, imageIndex) => {
+    setCartItems(prevItems => prevItems.filter(item => !(item.product === id && item.size === size && item.color === color && item.imageIndex === imageIndex)));
   };
 
   const clearCart = () => {

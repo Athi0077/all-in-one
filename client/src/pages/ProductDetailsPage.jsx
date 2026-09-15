@@ -31,6 +31,7 @@ const ProductDetailsPage = () => {
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
   const { user } = useContext(AuthContext);
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -59,7 +60,11 @@ const ProductDetailsPage = () => {
       toast.error('Please select a size first');
       return;
     }
-    addToCart(product, qty, selectedSize, activeImage);
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      toast.error('Please select a color first');
+      return;
+    }
+    addToCart(product, qty, selectedSize, selectedColor, activeImage);
     toast.success('Added to cart');
   };
 
@@ -260,6 +265,26 @@ const ProductDetailsPage = () => {
               </div>
             )}
           </div>
+
+          {/* Color Selector */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-gray-900">Select Color</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {product.colors.map(color => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`h-12 min-w-[3rem] px-4 rounded-xl border-2 font-bold text-sm transition-all ${selectedColor === color ? 'border-primary bg-primary text-white shadow-md' : 'border-gray-200 text-gray-700 hover:border-primary'}`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Size Selector */}
           {product.sizes && product.sizes.length > 0 && (
