@@ -13,6 +13,7 @@ import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import ProfilePage from './pages/ProfilePage';
 import WishlistPage from './pages/WishlistPage';
+import PriceComparisonPage from './pages/PriceComparisonPage';
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin';
@@ -47,6 +48,7 @@ function App() {
           <Route path="orders/:id" element={<OrderDetailsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="wishlist" element={<WishlistPage />} />
+          <Route path="price-comparison" element={<PriceComparisonPage />} />
           {/* add more routes later */}
         </Route>
 

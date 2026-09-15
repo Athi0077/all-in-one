@@ -18,6 +18,7 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import priceComparisonRoutes from './routes/priceComparisonRoutes.js';
 
 import dns from 'node:dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -74,6 +75,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/price-comparison', priceComparisonRoutes);
 
 // Make uploads folder static
 const __dirname = path.resolve();

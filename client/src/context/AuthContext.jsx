@@ -25,10 +25,13 @@ export const AuthProvider = ({ children }) => {
              localStorage.setItem('user', JSON.stringify(updatedUser));
           }
         } catch (error) {
-           console.error("Failed to verify auth session:", error);
-           // Optional: clear auth if strict verification is required
-           // logoutService();
-           // setUser(null);
+           if (error.response?.status === 401) {
+             // Token expired or invalid, clear auth silently
+             logoutService();
+             setUser(null);
+           } else {
+             console.error("Failed to verify auth session:", error);
+           }
         }
       }
       setLoading(false);

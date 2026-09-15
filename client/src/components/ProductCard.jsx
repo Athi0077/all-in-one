@@ -7,6 +7,7 @@ import { getImageUrl } from '../utils/getImageUrl';
 import toast from 'react-hot-toast';
 import { Eye } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
+import ComparePricesButton from './ComparePricesButton';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
@@ -116,6 +117,7 @@ const ProductCard = ({ product }) => {
             {product.discountPrice > 0 && (
               <span className="text-xs sm:text-sm text-text-muted line-through">${product.price.toFixed(2)}</span>
             )}
+            <ComparePricesButton productName={product.name} />
           </div>
           
           <button 

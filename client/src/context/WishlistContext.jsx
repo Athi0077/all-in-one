@@ -23,7 +23,9 @@ export const WishlistProvider = ({ children }) => {
       const data = await getWishlist();
       setWishlist(data);
     } catch (error) {
-      console.error('Error fetching wishlist', error);
+      if (error.response?.status !== 401) {
+        console.error('Error fetching wishlist', error);
+      }
     }
     setLoading(false);
   };
