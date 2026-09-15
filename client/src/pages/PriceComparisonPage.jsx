@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import PriceComparisonSearch from '../components/PriceComparisonSearch';
 import PriceComparisonFilters from '../components/PriceComparisonFilters';
 import PriceComparisonCard from '../components/PriceComparisonCard';
@@ -25,7 +25,7 @@ const PriceComparisonPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`/api/price-comparison?search=${encodeURIComponent(searchQuery)}`);
+      const response = await api.get(`/price-comparison?search=${encodeURIComponent(searchQuery)}`);
       if (response.data && response.data.results) {
         setData(response.data);
       } else {
