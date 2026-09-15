@@ -203,32 +203,20 @@ const CategoryManagement = () => {
           <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-6">{isEdit ? 'Edit Category' : 'Create Category'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Name</label>
-                <select 
-                  name="name" 
-                  value={formData.name} 
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFormData(prev => ({
-                      ...prev,
-                      name: value,
-                      slug: value.toLowerCase().replace(/ /g, '-')
-                    }));
-                  }}
-                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  <option value="Mens">Mens</option>
-                  <option value="Womens">Womens</option>
-                  <option value="Kids">Kids</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Home Appliance">Home Appliance</option>
-                  <option value="Gift">Gift</option>
-                  <option value="Others">Others</option>
-                </select>
-              </div>
+              <Input 
+                label="Name" 
+                name="name" 
+                value={formData.name} 
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    name: value,
+                    slug: value.toLowerCase().replace(/ /g, '-')
+                  }));
+                }} 
+                required 
+              />
               <Input label="Slug" name="slug" value={formData.slug} onChange={handleChange} required />
               <div>
                 <label className="block text-sm font-bold text-gray-900 mb-2">Description</label>
@@ -241,32 +229,43 @@ const CategoryManagement = () => {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2">Category Image</label>
-                {formData.image ? (
-                  <div className="relative w-32 h-32 rounded-xl border border-gray-200 overflow-hidden group mb-2">
-                    <img src={getImageUrl(formData.image)} alt="Category" className="w-full h-full object-cover" />
-                    <button 
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
-                      className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white"
-                    >
-                      <X size={24} />
-                    </button>
-                  </div>
-                ) : (
-                  <label className="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 hover:text-primary hover:border-primary hover:bg-primary/5 cursor-pointer transition-colors relative mb-2">
-                    {uploading ? (
-                       <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <>
-                        <Upload size={24} className="mb-1" />
-                        <span className="text-xs font-medium">Upload</span>
-                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-                      </>
-                    )}
-                  </label>
-                )}
+              <div className="space-y-4">
+                <Input 
+                  label="Category Image URL" 
+                  name="image" 
+                  value={formData.image} 
+                  onChange={handleChange} 
+                  placeholder="Paste image URL here or upload below"
+                />
+                
+                <div className="flex items-center gap-4">
+                  {formData.image && (
+                    <div className="relative w-24 h-24 rounded-xl border border-gray-200 overflow-hidden group flex-shrink-0">
+                      <img src={getImageUrl(formData.image)} alt="Category" className="w-full h-full object-cover" />
+                      <button 
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                        className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white"
+                      >
+                        <X size={24} />
+                      </button>
+                    </div>
+                  )}
+                  
+                  {!formData.image && (
+                    <label className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-500 hover:text-primary hover:border-primary hover:bg-primary/5 cursor-pointer transition-colors relative">
+                      {uploading ? (
+                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <Upload size={24} className="mb-1" />
+                          <span className="text-xs font-medium text-center px-1">Upload</span>
+                          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                        </>
+                      )}
+                    </label>
+                  )}
+                </div>
               </div>
               
               <label className="flex items-center gap-3 cursor-pointer py-2">
