@@ -11,7 +11,7 @@ const PriceComparisonCard = ({ result }) => {
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-2">
               <img 
-                src={`https://logo.clearbit.com/${result.store.toLowerCase()}.com`} 
+                src={`https://www.google.com/s2/favicons?domain=${result.store.toLowerCase()}.com&sz=64`} 
                 alt={`${result.store} logo`}
                 className="w-6 h-6 object-contain rounded-sm"
                 onError={(e) => {
